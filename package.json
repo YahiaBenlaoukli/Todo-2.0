@@ -10,11 +10,16 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@tailwindcss/postcss": "^4.1.18",
+    "autoprefixer": "^10.4.24",
     "better-sqlite3": "^12.6.2",
+    "postcss": "^8.5.6",
+    "postcss-cli": "^11.0.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^5.5.0",
-    "react-router-dom": "^7.13.0"
+    "react-router-dom": "^7.13.0",
+    "tailwindcss": "^4.1.18"
   },
   "devDependencies": {
     "@types/react": "^18.2.64",

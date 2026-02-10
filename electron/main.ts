@@ -1,10 +1,11 @@
 import { app, BrowserWindow } from 'electron'
-import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
+import { ipcMain } from 'electron'
 import path from 'node:path'
+import { getTodos, addTodo, deleteTodo, updateTodo } from './services/db.ts'
 
-const require = createRequire(import.meta.url)
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 // The built directory structure
 //
@@ -65,4 +66,16 @@ app.on('activate', () => {
   }
 })
 
-app.whenReady().then(createWindow)
+app.whenReady().then(() => {
+
+
+  ipcMain.handle('get-todos', () => getTodos());
+
+  ipcMain.handle('add-todo', (_event, todo) => addTodo(todo));
+
+  ipcMain.handle('delete-todo', (_event, id) => deleteTodo(id));
+
+  ipcMain.handle('update-todo', (_event, todo) => updateTodo(todo));
+
+  createWindow();
+});

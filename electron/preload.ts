@@ -1,4 +1,5 @@
 import { ipcRenderer, contextBridge } from 'electron'
+import type { todo } from './services/types.ts'
 
 // --------- Expose some API to the Renderer process ---------
 contextBridge.exposeInMainWorld('ipcRenderer', {
@@ -18,7 +19,8 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
     const [channel, ...omit] = args
     return ipcRenderer.invoke(channel, ...omit)
   },
-
-  // You can expose other APTs you need here.
-  // ...
+  getTodos: () => ipcRenderer.invoke("get-todos"),
+  addTodo: (todo: todo) => ipcRenderer.invoke("add-todo", todo),
+  deleteTodo: (id: number) => ipcRenderer.invoke("delete-todo", id),
+  updateTodo: (todo: todo) => ipcRenderer.invoke("update-todo", todo),
 })

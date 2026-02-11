@@ -20,7 +20,7 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
     return ipcRenderer.invoke(channel, ...omit)
   },
   getTodos: () => ipcRenderer.invoke("get-todos"),
-  addTodo: (todo: todo) => ipcRenderer.invoke("add-todo", todo),
+  addTodo: (taskName: string, taskDes: string) => ipcRenderer.invoke("add-todo", taskName, taskDes),
   deleteTodo: (id: number) => ipcRenderer.invoke("delete-todo", id),
-  updateTodo: (todo: todo) => ipcRenderer.invoke("update-todo", todo),
+  updateTodo: (id: number, taskName: string, taskDes: string) => ipcRenderer.invoke("update-todo", id, taskName, taskDes),
 })

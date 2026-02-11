@@ -26,12 +26,14 @@ export async function getTodos() {
     }
 }
 
-export async function addTodo(todo: todo) {
+export async function addTodo(taskName: string, taskDes: string) {
     try {
-        const { name, description, created_at } = todo;
+        const name = taskName;
+        const description = taskDes;
+        const created_at = new Date().toISOString();
         const stmt = db.prepare('INSERT INTO todos (name,description,created_at) VALUES (?,?,?)');
-        stmt.run(name, description, created_at);
-        return { status: 'success', message: 'Todo added successfully' };
+        const result = stmt.run(name, description, created_at);
+        return { status: 'success', message: 'Todo added successfully', id: result.lastInsertRowid };
     } catch (error: any) {
         console.error('Error adding todo:', error);
         return { status: 'error', message: error.message };
@@ -52,11 +54,10 @@ export async function deleteTodo(id: number) {
 
 
 
-export async function updateTodo(todo: todo) {
+export async function updateTodo(id: number, taskName: string, taskDes: string) {
     try {
-        const { id, name, description } = todo;
         const stmt = db.prepare('UPDATE todos SET name = ?, description = ? WHERE id = ?');
-        stmt.run(name, description, id);
+        stmt.run(taskName, taskDes, id);
         return { status: 'success', message: 'Todo updated successfully' };
     } catch (error: any) {
         console.error('Error updating todo:', error);

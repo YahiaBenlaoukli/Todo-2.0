@@ -71,11 +71,11 @@ app.whenReady().then(() => {
 
   ipcMain.handle('get-todos', () => getTodos());
 
-  ipcMain.handle('add-todo', (_event, todo) => addTodo(todo));
+  ipcMain.handle('add-todo', (_event, taskName, taskDes) => addTodo(taskName, taskDes));
 
   ipcMain.handle('delete-todo', (_event, id) => deleteTodo(id));
 
-  ipcMain.handle('update-todo', (_event, todo) => updateTodo(todo));
+  ipcMain.handle('update-todo', (_event, id, taskName, taskDes) => updateTodo(id, taskName, taskDes));
 
   createWindow();
 });

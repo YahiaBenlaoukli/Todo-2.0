@@ -12,3 +12,15 @@ body {
   --color-accent: #456990;
   --color-text: #f0f0f0;
 }
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+  background-color: var(--color-text);
+
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--color-primary);
+  border-radius: 5px;
+}

@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@tailwindcss/postcss": "^4.1.18",
+    "@xyflow/react": "^12.10.0",
     "autoprefixer": "^10.4.24",
     "better-sqlite3": "^12.6.2",
     "postcss": "^8.5.6",

@@ -1,37 +1,61 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { FaTasks, FaHome, FaMap, FaHeadphonesAlt, FaPhone, FaBars, FaTimes } from "react-icons/fa";
+import { FaTasks, FaHome, FaMap, FaHeadphonesAlt, FaPhone, FaBars, FaTimes, FaArrowLeft } from "react-icons/fa";
 import { LuNotebookText } from "react-icons/lu";
 
-const Navbar: React.FC = () => {
+interface NavbarProps {
+    isSidebarOpen?: boolean;
+    setIsSidebarOpen?: (isOpen: boolean) => void;
+}
+
+const Navbar: React.FC<NavbarProps> = ({ isSidebarOpen = true, setIsSidebarOpen }) => {
     const location = useLocation();
-    const [isOpen, setIsOpen] = useState(false);
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const isActive = (path: string) => location.pathname === path;
 
-    const toggleMenu = () => setIsOpen(!isOpen);
+    const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen);
+    const toggleSidebar = () => setIsSidebarOpen && setIsSidebarOpen(!isSidebarOpen);
 
     return (
         <>
             <button
-                onClick={toggleMenu}
-                className="fixed top-4 left-4 z-50 p-2 rounded-lg bg-white shadow-md md:hidden text-primary hover:bg-gray-50 transition-colors"
+                onClick={() => {
+                    if (window.innerWidth < 768) {
+                        toggleMobileMenu();
+                    } else {
+                        toggleSidebar();
+                    }
+                }}
+                className={`fixed top-4 left-4 z-50 p-2 rounded-lg bg-white shadow-md text-primary hover:bg-gray-50 transition-colors ${!isSidebarOpen || window.innerWidth < 768 ? 'block' : 'hidden md:hidden'}`}
                 aria-label="Toggle Menu"
             >
-                {isOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
+                {mobileMenuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
             </button>
 
-            {isOpen && (
+            {mobileMenuOpen && (
                 <div
-                    className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 md:hidden animate-in fade-in duration-200"
-                    onClick={() => setIsOpen(false)}
+                    className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 md:hidden animate-in fade-in duration-200 shadow-[-5px_0_10px_rgba(0,0,0,0.1)]"
+                    onClick={() => setMobileMenuOpen(false)}
                 />
             )}
 
-            <nav className={`fixed left-0 top-0 h-screen w-64 bg-secondary/95 backdrop-blur-xl border-r border-white/10 shadow-2xl z-50 flex flex-col justify-between py-8 px-6 transition-transform duration-300 ease-in-out md:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-                <div className="flex flex-col items-center">
-                    <div className="relative group cursor-pointer">
-                        <div className="absolute -inset-1 bg-gradient-to-r from-primary to-accent rounded-xl blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200"></div>
+            <nav className={`fixed left-0 top-0 h-screen w-64 bg-secondary/95 backdrop-blur-xl border-r border-white/10 shadow-2xl z-50 flex flex-col justify-between py-8 px-6 transition-transform duration-300 ease-in-out 
+                ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} 
+                ${isSidebarOpen ? 'md:translate-x-0' : 'md:-translate-x-full'}`}>
+
+                <div className="flex flex-col items-center relative">
+                    <button
+                        onClick={() => setIsSidebarOpen && setIsSidebarOpen(false)}
+                        className="absolute -top-2 -right-2 p-2 text-white/50 hover:text-white transition-colors hidden md:block"
+                        title="Collapse Sidebar"
+                    >
+                        <FaArrowLeft size={20} />
+                    </button>
+
+                    <div className="relative group cursor-pointer mt-4">
+                        <div className="absolute -inset-1 bg-gradient-to-r from-primary to-accent rounded-xl blur opacity-25 group-hover:opacity-75 transition duration-1000 group-hover:duration-200">
+                        </div>
                         <img
                             src="src/assets/Todo.png"
                             alt="Logo"
@@ -46,28 +70,28 @@ const Navbar: React.FC = () => {
                         icon={<FaHome size={20} />}
                         label="Home"
                         active={isActive('/')}
-                        onClick={() => setIsOpen(false)}
+                        onClick={() => setMobileMenuOpen(false)}
                     />
                     <NavItem
                         to="/tasks"
                         icon={<FaTasks size={20} />}
                         label="Tasks"
                         active={isActive('/tasks')}
-                        onClick={() => setIsOpen(false)}
+                        onClick={() => setMobileMenuOpen(false)}
                     />
                     <NavItem
                         to="/roadmaps"
                         icon={<FaMap size={20} />}
                         label="RoadMaps"
                         active={isActive('/roadmaps')}
-                        onClick={() => setIsOpen(false)}
+                        onClick={() => setMobileMenuOpen(false)}
                     />
                     <NavItem
                         to="/notes"
                         icon={<LuNotebookText size={20} />}
                         label="Notes"
                         active={isActive('/notes')}
-                        onClick={() => setIsOpen(false)}
+                        onClick={() => setMobileMenuOpen(false)}
                     />
                 </div>
 
@@ -78,14 +102,14 @@ const Navbar: React.FC = () => {
                         icon={<FaPhone size={18} />}
                         label="About Us"
                         active={isActive('/about')}
-                        onClick={() => setIsOpen(false)}
+                        onClick={() => setMobileMenuOpen(false)}
                     />
                     <NavItem
                         to="/contact"
                         icon={<FaHeadphonesAlt size={18} />}
                         label="Contact Us"
                         active={isActive('/contact')}
-                        onClick={() => setIsOpen(false)}
+                        onClick={() => setMobileMenuOpen(false)}
                     />
                     <p className="text-xs text-center text-white/30 mt-6 font-light">© 2026 Todo App</p>
                 </div>

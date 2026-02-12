@@ -1,6 +1,4 @@
 import Database from 'better-sqlite3'
-import { todo } from './types'
-
 const db = new Database('todo2.0.db', { verbose: console.log })
 db.pragma('journal_mode = WAL');
 

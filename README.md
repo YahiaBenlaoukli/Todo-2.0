@@ -1,30 +1,16 @@
-# React + TypeScript + Vite
+#documentation
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+this is a project made with electron and react for managing tasks and roadmaps
 
-Currently, two official plugins are available:
+and this documentation lik amine
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+for the database i choosed sqlite since we can include it in the installation wizard if  we export the app 
 
-## Expanding the ESLint configuration
+how to setup the database
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+first you need to have sqlite installed then
 
-- Configure the top-level `parserOptions` property like this:
+excute the comment i left in the files db.ts and roadmap.ts
 
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
-```
+hada ga3 wsh 3andi lyoum 3ayatli amine
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list

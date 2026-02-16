@@ -1,6 +1,8 @@
 import Database from 'better-sqlite3'
 const db = new Database('todo2.0.db', { verbose: console.log })
 db.pragma('journal_mode = WAL');
+import { type NodeType } from '../../electron/services/types';
+
 
 
 /*const quertyCreateTable = `
@@ -48,3 +50,75 @@ CREATE TABLE roadmaps (
 
 db.exec(quertyCreateTable);*/
 
+
+export async function getRoadmaps() {
+    try {
+        const row = db.prepare('SELECT * FROM roadmaps').all();
+        return { status: 'success', data: row };
+    } catch (error) {
+        return { status: "an error occurred", message: (error as Error).message };
+    }
+}
+
+export async function addRoadmap(name: string) {
+    try {
+        const created_at = new Date().toISOString();
+        const stmt = db.prepare('INSERT INTO roadmaps (name, created_at) VALUES (?, ?)');
+        const result = stmt.run(name, created_at);
+        return { status: 'success', message: 'Roadmap added successfully', id: result.lastInsertRowid };
+    } catch (error) {
+        return { status: "an error occurred", message: (error as Error).message };
+    }
+}
+
+export async function deleteRoadmap(id: number) {
+    try {
+        const stmt = db.prepare('DELETE FROM roadmaps WHERE id = ?');
+        stmt.run(id);
+        return { status: 'success', message: 'Roadmap deleted successfully' };
+    } catch (error) {
+        return { status: "an error occurred", message: (error as Error).message };
+    }
+}
+
+export async function getRoadmapNodes(roadmapId: number) {
+    try {
+        const stmt = db.prepare('SELECT * FROM nodes WHERE roadmap_id = ?');
+        const nodes = stmt.all(roadmapId);
+        return { status: 'success', data: nodes };
+    } catch (error) {
+        return { status: "an error occurred", message: (error as Error).message };
+    }
+}
+
+export async function addTaskNode(roadmapId: number, title: string, content: string, status: string, type: NodeType, positionX: number, positionY: number) {
+    try {
+        const created_at = new Date().toISOString();
+        const stmt = db.prepare('INSERT INTO nodes (roadmap_id, title, content, status, type_id, position_x, position_y, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
+        stmt.run(roadmapId, title, content, status, type, positionX, positionY, created_at);
+        return { status: 'success', message: 'Task node added successfully' };
+    } catch (error) {
+        return { status: "an error occurred", message: (error as Error).message };
+    }
+}
+
+export async function deleteNode(id: string) {
+    try {
+        const stmt = db.prepare('DELETE FROM nodes WHERE id = ?');
+        stmt.run(id);
+        return { status: 'success', message: 'Node deleted successfully' };
+    } catch (error) {
+        return { status: "an error occurred", message: (error as Error).message };
+    }
+}
+
+export async function updateNode(id: string, title: string, content: string, status: string, positionX: number, positionY: number) {
+    try {
+        const updated_at = new Date().toISOString();
+        const stmt = db.prepare('UPDATE nodes SET title = ?, content = ?, status = ?, position_x = ?, position_y = ?, updated_at = ? WHERE id = ?');
+        stmt.run(title, content, status, positionX, positionY, updated_at, id);
+        return { status: 'success', message: 'Node updated successfully' };
+    } catch (error) {
+        return { status: "an error occurred", message: (error as Error).message };
+    }
+}

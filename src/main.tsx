@@ -2,7 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { HashRouter, Route, Routes } from 'react-router-dom'
 import App from './Pages/App.tsx'
-import RoadMap from './Pages/RoadMap.tsx'
+import RoadMap from './Pages/RoadMapPage.tsx'
 import './index.css'
 
 

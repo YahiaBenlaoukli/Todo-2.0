@@ -1,7 +1,8 @@
 import { memo } from 'react';
 import { Handle, Position } from '@xyflow/react';
-import { NODE_TYPES, type NodeType } from '../../../electron/services/types';
-const TaskNode = ({ data }: { data: { roadmapId: number; description?: string; title: string; content?: string; type: NodeType; status?: 'pending' | 'in-progress' | 'completed'; url?: string, } }) => {
+import { type NodeType } from '../../../electron/services/types';
+
+const NoteNode = ({ data }: { data: { roadmapId: number; description?: string; title: string; content?: string; type: NodeType; status?: 'pending' | 'in-progress' | 'completed'; url?: string, } }) => {
     return (
         <div className="px-4 py-2 shadow-md rounded-md bg-white border-2 border-stone-400 min-w-[150px]">
             <div className="flex flex-col">
@@ -28,4 +29,4 @@ const TaskNode = ({ data }: { data: { roadmapId: number; description?: string; t
     );
 };
 
-export default memo(TaskNode);
+export default memo(NoteNode);

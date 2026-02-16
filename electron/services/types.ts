@@ -16,6 +16,7 @@ export type NodeType =
 
 export type TaskNode = {
     id: number;
+    type: NodeType;
     roadmapId: number;
     title: string;
     content?: string;
@@ -26,6 +27,7 @@ export type TaskNode = {
 
 export type NoteNode = {
     id: number;
+    type: NodeType;
     roadmapId: number;
     title: string;
     content?: string;
@@ -34,6 +36,7 @@ export type NoteNode = {
 
 export type ResourceNode = {
     id: number;
+    type: NodeType;
     roadmapId: number;
     title: string;
     content?: string;
@@ -44,6 +47,7 @@ export type ResourceNode = {
 
 export type MilestoneNode = {
     id: number;
+    type: NodeType;
     roadmapId: number;
     title: string;
     content?: string;

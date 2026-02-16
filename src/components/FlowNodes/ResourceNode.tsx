@@ -1,6 +1,7 @@
 import { memo } from 'react';
 import { Handle, Position } from '@xyflow/react';
-import { NODE_TYPES, type NodeType } from '../../../electron/services/types';
+import { type NodeType } from '../../../electron/services/types';
+
 const ResourceNode = ({ data }: { data: { roadmapId: number; description?: string; title: string; content?: string; type: NodeType; status?: 'pending' | 'in-progress' | 'completed'; url?: string, } }) => {
     return (
         <div className="px-4 py-2 shadow-md rounded-md bg-white border-2 border-stone-400 min-w-[150px]">

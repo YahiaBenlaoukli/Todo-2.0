@@ -101,7 +101,37 @@ export async function addTaskNode(roadmapId: number, title: string, content: str
         return { status: "an error occurred", message: (error as Error).message };
     }
 }
+export async function addResourceNode(roadmapId: number, title: string, content: string, url: string, type: NodeType, positionX: number, positionY: number) {
+    try {
+        const created_at = new Date().toISOString();
+        const stmt = db.prepare('INSERT INTO nodes (roadmap_id, title, content, url, type_id, position_x, position_y, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
+        stmt.run(roadmapId, title, content, url, type, positionX, positionY, created_at);
+        return { status: 'success', message: 'Resource node added successfully' };
+    } catch (error) {
+        return { status: "an error occurred", message: (error as Error).message };
+    }
+}
+export async function addNoteNode(roadmapId: number, title: string, content: string, type: NodeType, positionX: number, positionY: number) {
+    try {
+        const created_at = new Date().toISOString();
+        const stmt = db.prepare('INSERT INTO nodes (roadmap_id, title, content, type_id, position_x, position_y, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)');
+        stmt.run(roadmapId, title, content, type, positionX, positionY, created_at);
+        return { status: 'success', message: 'Note node added successfully' };
+    } catch (error) {
+        return { status: "an error occurred", message: (error as Error).message };
+    }
+}
 
+export async function addMilestoneNode(roadmapId: number, title: string, content: string, dueDate: string, type: NodeType, positionX: number, positionY: number) {
+    try {
+        const created_at = new Date().toISOString();
+        const stmt = db.prepare('INSERT INTO nodes (roadmap_id, title, content, due_date, type_id, position_x, position_y, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
+        stmt.run(roadmapId, title, content, dueDate, type, positionX, positionY, created_at);
+        return { status: 'success', message: 'Milestone node added successfully' };
+    } catch (error) {
+        return { status: "an error occurred", message: (error as Error).message };
+    }
+}
 export async function deleteNode(id: string) {
     try {
         const stmt = db.prepare('DELETE FROM nodes WHERE id = ?');

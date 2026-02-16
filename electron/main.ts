@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url'
 import { ipcMain } from 'electron'
 import path from 'node:path'
 import { getTodos, addTodo, deleteTodo, updateTodo } from './services/db.ts'
+import { getRoadmaps, addRoadmap, deleteRoadmap, getRoadmapNodes, addTaskNode, addResourceNode, addNoteNode, addMilestoneNode, deleteNode, updateNode } from './services/roadmap.ts'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -76,6 +77,27 @@ app.whenReady().then(() => {
   ipcMain.handle('delete-todo', (_event, id) => deleteTodo(id));
 
   ipcMain.handle('update-todo', (_event, id, taskName, taskDes) => updateTodo(id, taskName, taskDes));
+
+  ipcMain.handle('get-roadmaps', () => getRoadmaps());
+
+  ipcMain.handle('add-roadmap', (_event, name) => addRoadmap(name));
+
+  ipcMain.handle('delete-roadmap', (_event, id) => deleteRoadmap(id));
+
+  ipcMain.handle('get-roadmap-nodes', (_event, roadmapId) => getRoadmapNodes(roadmapId));
+
+  ipcMain.handle('add-task-node', (_event, roadmapId, title, content, status, type, positionX, positionY) => addTaskNode(roadmapId, title, content, status, type, positionX, positionY));
+
+  ipcMain.handle('add-resource-node', (_event, roadmapId, title, content, url, type, positionX, positionY) => addResourceNode(roadmapId, title, content, url, type, positionX, positionY));
+
+  ipcMain.handle('add-note-node', (_event, roadmapId, title, content, type, positionX, positionY) => addNoteNode(roadmapId, title, content, type, positionX, positionY));
+
+  ipcMain.handle('add-milestone-node', (_event, roadmapId, title, content, dueDate, type, positionX, positionY) => addMilestoneNode(roadmapId, title, content, dueDate, type, positionX, positionY));
+
+  ipcMain.handle('delete-node', (_event, id) => deleteNode(id));
+
+  ipcMain.handle('update-node', (_event, id, title, content, status, type, positionX, positionY) => updateNode(id, title, content, status, type, positionX, positionY));
+
 
   createWindow();
 });

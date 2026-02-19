@@ -4,6 +4,14 @@ export type todo = {
     description: string,
     created_at: string
 }
+
+export type Roadmap = {
+    id: number,
+    name: string,
+    created_at: string
+}
+
+
 export const NODE_TYPES = {
     TASKNODE: 1,
     NOTENODE: 2,
@@ -13,6 +21,7 @@ export const NODE_TYPES = {
 
 export type NodeType =
     typeof NODE_TYPES[keyof typeof NODE_TYPES];
+
 
 export type TaskNode = {
     id: number;

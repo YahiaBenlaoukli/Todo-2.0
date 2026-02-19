@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ReactFlow, addEdge, Background, Controls, MiniMap, useNodesState, useEdgesState, Node, Edge, NodeChange, useReactFlow } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import Navbar from '../components/Navbar';
@@ -7,7 +7,8 @@ import ResourceNode from '../components/FlowNodes/ResourceNode';
 import NoteNode from '../components/FlowNodes/NoteNode';
 import MilestoneNode from '../components/FlowNodes/MilestoneNode';
 import { NODE_TYPES, type NodeType } from '../../electron/services/types';
-import type { TaskNode as TaskNodeType, NoteNode as NoteNodeType, ResourceNode as ResourceNodeType, MilestoneNode as MilestoneNodeType } from '../../electron/services/types';
+import type { TaskNode as TaskNodeType, NoteNode as NoteNodeType, ResourceNode as ResourceNodeType, MilestoneNode as MilestoneNodeType, Roadmap } from '../../electron/services/types';
+import { ipcMain } from 'electron';
 
 
 const initialNodes: Node[] = [
@@ -48,8 +49,45 @@ function RoadMap() {
     const [nodeTitle, setNodeTitle] = useState('');
     const [nodeDescription, setNodeDescription] = useState('');
     const [nodeType, setNodeType] = useState<NodeType>(NODE_TYPES.TASKNODE);
+    const [roadmaps, setRoadmaps] = useState<Roadmap[]>([]);
+    const [selectedRoadmap, setSelectedRoadmap] = useState<Roadmap | null>(null);
     const [nodeUrl, setNodeUrl] = useState('');
     const [nodeDueDate, setNodeDueDate] = useState('');
+
+
+    const fetchRoadmaps = async () => {
+        const response: any = await window.ipcRenderer.invoke('get-roadmaps')
+        if (response.status === 'success') {
+            setRoadmaps(response.data)
+        } else {
+            console.error('Failed to fetch roadmaps:', response.message)
+        }
+    }
+    useEffect(() => {
+        fetchRoadmaps()
+    }, [])
+
+
+    const handleAddRoadmap = async (name: string) => {
+        const response: any = await window.ipcRenderer.invoke('add-roadmap', name)
+        if (response.status === 'success') {
+            fetchRoadmaps()
+        } else {
+            console.error('Failed to add roadmap:', response.message)
+        }
+    }
+
+    const handleDeleteRoadmap = async (id: number) => {
+        const response: any = await window.ipcRenderer.invoke('delete-roadmap', id)
+        if (response.status === 'success') {
+            fetchRoadmaps()
+        } else {
+            console.error('Failed to delete roadmap:', response.message)
+        }
+    }
+
+
+
 
 
     const onConnect = useCallback(
@@ -65,26 +103,51 @@ function RoadMap() {
         [NODE_TYPES.MILESTONENODE]: MilestoneNode,
     }), []);
 
-    const handleAddNode = (e: React.FormEvent) => {
+    const handleAddNode = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!nodeTitle.trim()) return;
 
-        const newNode: Node = {
-            id: `node-${Date.now()}`,
-            position, // Use the position from where user right-clicked
-            data: {
-                title: nodeTitle,
-                description: nodeDescription,
-                status: 'pending',
-                type: nodeType,
-                roadmapId: 1,
-                ...(nodeType === NODE_TYPES.RESOURCENODE && { url: nodeUrl }),
-                ...(nodeType === NODE_TYPES.MILESTONENODE && { dueDate: nodeDueDate }),
-            },
-            type: 'custom',
-        };
+        switch (nodeType) {
+            case NODE_TYPES.TASKNODE:
+                const response: any = await window.ipcRenderer.invoke('add-task-node', selectedRoadmap?.id, nodeTitle, nodeDescription, 'pending', nodeType, position.x, position.y)
 
-        setNodes((nds) => [...nds, newNode]);
+                if (response.status === 'success') {
+                    const newNodeData = response.data;
+
+                    const newNode: Node = {
+                        id: newNodeData.id.toString(),
+                        type: 'custom',
+                        position: { x: newNodeData.position_x, y: newNodeData.position_y },
+                        data: {
+                            id: newNodeData.id,
+                            title: newNodeData.title,
+                            description: newNodeData.content,
+                            status: newNodeData.status,
+                            roadmapId: newNodeData.roadmap_id,
+                            type: newNodeData.type_id,
+                            created_at: newNodeData.created_at,
+                            updated_at: newNodeData.updated_at || null
+                        },
+                    };
+                    setNodes((nds) => nds.concat(newNode));
+                }
+                break;
+            case NODE_TYPES.NOTENODE:
+                await window.ipcRenderer.invoke('add-note-node', selectedRoadmap?.id, nodeTitle, nodeDescription, nodeType, position.x, position.y)
+                //todo later
+                break;
+            case NODE_TYPES.RESOURCENODE:
+                await window.ipcRenderer.invoke('add-resource-node', selectedRoadmap?.id, nodeTitle, nodeDescription, nodeUrl, nodeType, position.x, position.y)
+                //todo later
+                break;
+            case NODE_TYPES.MILESTONENODE:
+                await window.ipcRenderer.invoke('add-milestone-node', selectedRoadmap?.id, nodeTitle, nodeDescription, nodeDueDate, nodeType, position.x, position.y)
+                //todo later
+                break;
+            default:
+                break;
+        }
+
         closeMenu();
     }
 

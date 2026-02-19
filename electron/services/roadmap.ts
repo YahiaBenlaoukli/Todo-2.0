@@ -95,8 +95,10 @@ export async function addTaskNode(roadmapId: number, title: string, content: str
     try {
         const created_at = new Date().toISOString();
         const stmt = db.prepare('INSERT INTO nodes (roadmap_id, title, content, status, type_id, position_x, position_y, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
-        stmt.run(roadmapId, title, content, status, type, positionX, positionY, created_at);
-        return { status: 'success', message: 'Task node added successfully' };
+        const result = stmt.run(roadmapId, title, content, status, type, positionX, positionY, created_at);
+        const newNode = db.prepare('SELECT * FROM nodes WHERE id = ?').get(result.lastInsertRowid);
+
+        return { status: 'success', message: 'Task node added successfully', data: newNode };
     } catch (error) {
         return { status: "an error occurred", message: (error as Error).message };
     }

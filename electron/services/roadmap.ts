@@ -6,12 +6,24 @@ import { type NodeType } from '../../electron/services/types';
 
 
 /*const quertyCreateTable = `
+PRAGMA foreign_keys = ON;
+
+--  Roadmaps
+CREATE TABLE roadmaps (
+    id INTEGER PRIMARY KEY,
+    name TEXT NOT NULL,
+    created_at TEXT NOT NULL
+);
+
+--  Node types
 CREATE TABLE node_types (
     id INTEGER PRIMARY KEY,
     name TEXT UNIQUE NOT NULL
 );
+
+--  Nodes
 CREATE TABLE nodes (
-    id TEXT PRIMARY KEY,
+    id INTEGER PRIMARY KEY,
     type_id INTEGER NOT NULL,
     title TEXT NOT NULL,
     content TEXT,
@@ -20,31 +32,35 @@ CREATE TABLE nodes (
     position_x REAL NOT NULL,
     position_y REAL NOT NULL,
     created_at TEXT NOT NULL,
-    updated_at TEXT NOT NULL,
-    roadmap_id TEXT NOT NULL,
+    updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+    roadmap_id INTEGER NOT NULL,
     FOREIGN KEY (type_id) REFERENCES node_types(id),
     FOREIGN KEY (roadmap_id) REFERENCES roadmaps(id) ON DELETE CASCADE
-
 );
-CREATE TABLE edges_types(
+
+--  Edge types
+CREATE TABLE edges_types (
     id INTEGER PRIMARY KEY,
     name TEXT UNIQUE NOT NULL
 );
+
+--  Edges
 CREATE TABLE edges (
-    id TEXT PRIMARY KEY,
-    source TEXT NOT NULL,
-    target TEXT NOT NULL,
+    id INTEGER PRIMARY KEY,
+    source INTEGER NOT NULL,
+    target INTEGER NOT NULL,
     type_id INTEGER NOT NULL,
     created_at TEXT NOT NULL,
     FOREIGN KEY (source) REFERENCES nodes(id) ON DELETE CASCADE,
     FOREIGN KEY (target) REFERENCES nodes(id) ON DELETE CASCADE,
     FOREIGN KEY (type_id) REFERENCES edges_types(id)
 );
-CREATE TABLE roadmaps (
-    id TEXT PRIMARY KEY,
-    name TEXT NOT NULL,
-    created_at TEXT NOT NULL
-);
+
+-- Optional but recommended indexes
+CREATE INDEX idx_nodes_roadmap ON nodes(roadmap_id);
+CREATE INDEX idx_edges_source ON edges(source);
+CREATE INDEX idx_edges_target ON edges(target);
+
 
 `;
 
@@ -107,8 +123,9 @@ export async function addResourceNode(roadmapId: number, title: string, content:
     try {
         const created_at = new Date().toISOString();
         const stmt = db.prepare('INSERT INTO nodes (roadmap_id, title, content, url, type_id, position_x, position_y, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
-        stmt.run(roadmapId, title, content, url, type, positionX, positionY, created_at);
-        return { status: 'success', message: 'Resource node added successfully' };
+        const result = stmt.run(roadmapId, title, content, url, type, positionX, positionY, created_at);
+        const newNode = db.prepare('SELECT * FROM nodes WHERE id = ?').get(result.lastInsertRowid);
+        return { status: 'success', message: 'Resource node added successfully', data: newNode };
     } catch (error) {
         return { status: "an error occurred", message: (error as Error).message };
     }
@@ -117,8 +134,9 @@ export async function addNoteNode(roadmapId: number, title: string, content: str
     try {
         const created_at = new Date().toISOString();
         const stmt = db.prepare('INSERT INTO nodes (roadmap_id, title, content, type_id, position_x, position_y, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)');
-        stmt.run(roadmapId, title, content, type, positionX, positionY, created_at);
-        return { status: 'success', message: 'Note node added successfully' };
+        const result = stmt.run(roadmapId, title, content, type, positionX, positionY, created_at);
+        const newNode = db.prepare('SELECT * FROM nodes WHERE id = ?').get(result.lastInsertRowid);
+        return { status: 'success', message: 'Note node added successfully', data: newNode };
     } catch (error) {
         return { status: "an error occurred", message: (error as Error).message };
     }
@@ -128,8 +146,10 @@ export async function addMilestoneNode(roadmapId: number, title: string, content
     try {
         const created_at = new Date().toISOString();
         const stmt = db.prepare('INSERT INTO nodes (roadmap_id, title, content, due_date, type_id, position_x, position_y, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
-        stmt.run(roadmapId, title, content, dueDate, type, positionX, positionY, created_at);
-        return { status: 'success', message: 'Milestone node added successfully' };
+        const result = stmt.run(roadmapId, title, content, dueDate, type, positionX, positionY, created_at);
+        const newNode = db.prepare('SELECT * FROM nodes WHERE id = ?').get(result.lastInsertRowid);
+
+        return { status: 'success', message: 'Milestone node added successfully', data: newNode };
     } catch (error) {
         return { status: "an error occurred", message: (error as Error).message };
     }

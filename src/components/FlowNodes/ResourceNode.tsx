@@ -1,30 +1,39 @@
 import { memo } from 'react';
 import { Handle, Position } from '@xyflow/react';
 import { type NodeType } from '../../../electron/services/types';
+import { FiLink } from 'react-icons/fi';
 
-const ResourceNode = ({ data }: { data: { roadmapId: number; description?: string; title: string; content?: string; type: NodeType; status?: 'pending' | 'in-progress' | 'completed'; url?: string, } }) => {
+const ResourceNode = ({ data }: { data: { roadmapId: number; description?: string; title: string; content?: string; type: NodeType; url?: string; } }) => {
     return (
-        <div className="px-4 py-2 shadow-md rounded-md bg-white border-2 border-stone-400 min-w-[150px]">
-            <div className="flex flex-col">
-                <div className="flex items-center justify-between mb-2">
-                    <div className="font-bold text-sm text-gray-700">{data.title}</div>
-                    {data.status && (
-                        <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${data.status === 'completed' ? 'bg-green-100 text-green-700' :
-                            data.status === 'in-progress' ? 'bg-blue-100 text-blue-700' :
-                                'bg-gray-100 text-gray-500'
-                            }`}>
-                            {data.status}
-                        </span>
-                    )}
+        <div className="relative px-4 py-3 shadow-lg rounded-xl bg-white border-l-4 border-emerald-500 min-w-[180px] max-w-[260px] hover:shadow-xl transition-shadow">
+            <div className="flex items-center gap-2 mb-2">
+                <div className="w-6 h-6 rounded-md bg-emerald-100 flex items-center justify-center">
+                    <FiLink className="text-emerald-600 text-xs" />
                 </div>
-
-                {data.description && (
-                    <div className="text-xs text-gray-500">{data.description}</div>
-                )}
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-emerald-400">Resource</span>
             </div>
 
-            <Handle type="target" position={Position.Top} className="w-16 !bg-teal-500" />
-            <Handle type="source" position={Position.Bottom} className="w-16 !bg-teal-500" />
+            <div className="font-bold text-sm text-gray-800 mb-1">{data.title}</div>
+
+            {(data.content || data.description) && (
+                <div className="text-xs text-gray-500 mb-2 line-clamp-2">{data.content || data.description}</div>
+            )}
+
+            {data.url && (
+                <a
+                    href={data.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-[11px] text-emerald-600 hover:text-emerald-800 font-medium bg-emerald-50 px-2 py-1 rounded-md hover:bg-emerald-100 transition-colors"
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    <FiLink className="text-[10px]" />
+                    Open Link
+                </a>
+            )}
+
+            <Handle type="target" position={Position.Top} className="!w-3 !h-3 !bg-emerald-500 !border-2 !border-white !-top-1.5" />
+            <Handle type="source" position={Position.Bottom} className="!w-3 !h-3 !bg-emerald-500 !border-2 !border-white !-bottom-1.5" />
         </div>
     );
 };

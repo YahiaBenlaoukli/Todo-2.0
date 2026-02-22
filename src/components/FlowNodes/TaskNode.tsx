@@ -1,9 +1,9 @@
 import { memo } from 'react';
 import { Handle, Position } from '@xyflow/react';
 import { type NodeType } from '../../../electron/services/types';
-import { FiCheckSquare } from 'react-icons/fi';
+import { FiCheckSquare, FiEdit2, FiTrash2 } from 'react-icons/fi';
 
-const TaskNode = ({ data }: { data: { roadmapId: number; description?: string; title: string; content?: string; type: NodeType; status?: 'pending' | 'in-progress' | 'completed'; } }) => {
+const TaskNode = ({ data }: { data: { id: number; roadmapId: number; description?: string; title: string; content?: string; type: NodeType; status?: 'pending' | 'in-progress' | 'completed'; onDelete?: (id: string) => void; onEdit?: (data: any) => void; } }) => {
     const statusConfig = {
         'completed': { bg: 'bg-emerald-100', text: 'text-emerald-700', dot: 'bg-emerald-500' },
         'in-progress': { bg: 'bg-blue-100', text: 'text-blue-700', dot: 'bg-blue-500' },
@@ -12,7 +12,25 @@ const TaskNode = ({ data }: { data: { roadmapId: number; description?: string; t
     const status = data.status ? statusConfig[data.status] : statusConfig['pending'];
 
     return (
-        <div className="relative px-4 py-3 shadow-lg rounded-xl bg-white border-l-4 border-blue-500 min-w-[180px] max-w-[260px] hover:shadow-xl transition-shadow">
+        <div className="group relative px-4 py-3 shadow-lg rounded-xl bg-white border-l-4 border-blue-500 min-w-[180px] max-w-[260px] hover:shadow-xl transition-shadow">
+            {/* Hover action buttons */}
+            <div className="absolute -top-3 -right-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-all duration-200 z-10">
+                <button
+                    onClick={(e) => { e.stopPropagation(); data.onEdit?.(data); }}
+                    className="w-7 h-7 rounded-full bg-white shadow-md border border-gray-200 flex items-center justify-center text-blue-500 hover:bg-blue-50 hover:text-blue-700 hover:scale-110 transition-all duration-150"
+                    title="Edit node"
+                >
+                    <FiEdit2 className="text-xs" />
+                </button>
+                <button
+                    onClick={(e) => { e.stopPropagation(); data.onDelete?.(data.id.toString()); }}
+                    className="w-7 h-7 rounded-full bg-white shadow-md border border-gray-200 flex items-center justify-center text-red-400 hover:bg-red-50 hover:text-red-600 hover:scale-110 transition-all duration-150"
+                    title="Delete node"
+                >
+                    <FiTrash2 className="text-xs" />
+                </button>
+            </div>
+
             <div className="flex items-center gap-2 mb-2">
                 <div className="w-6 h-6 rounded-md bg-blue-100 flex items-center justify-center">
                     <FiCheckSquare className="text-blue-600 text-xs" />

@@ -8,7 +8,7 @@ import NoteNode from '../components/FlowNodes/NoteNode';
 import MilestoneNode from '../components/FlowNodes/MilestoneNode';
 import { NODE_TYPES, type NodeType } from '../../electron/services/types';
 import type { Roadmap } from '../../electron/services/types';
-import { FiPlus, FiTrash2, FiArrowLeft, FiMap } from 'react-icons/fi';
+import { FiPlus, FiTrash2, FiArrowLeft, FiMap, FiEdit2 } from 'react-icons/fi';
 
 
 function RoadMap() {
@@ -30,6 +30,13 @@ function RoadMap() {
     const [newRoadmapName, setNewRoadmapName] = useState('');
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
+
+    // Edit node modal state
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [editingNode, setEditingNode] = useState<any>(null);
+    const [editTitle, setEditTitle] = useState('');
+    const [editContent, setEditContent] = useState('');
+
 
 
     const fetchRoadmaps = async () => {
@@ -108,6 +115,65 @@ function RoadMap() {
         }
     };
 
+    const handleDeleteNode = async (nodeId: string) => {
+        const response: any = await window.ipcRenderer.invoke('delete-node', nodeId);
+        if (response.status === 'success') {
+            setNodes((nds) => nds.filter((n) => n.id !== nodeId));
+        } else {
+            console.error('Failed to delete node:', response.message);
+        }
+    };
+
+    const openEditModal = (nodeData: any) => {
+        setEditingNode(nodeData);
+        setEditTitle(nodeData.title || '');
+        setEditContent(nodeData.description || nodeData.content || '');
+        setIsEditModalOpen(true);
+    };
+
+    const handleUpdateNode = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!editingNode) return;
+
+        const node = nodes.find((n) => n.id === editingNode.id?.toString());
+        if (!node) return;
+
+        const response: any = await window.ipcRenderer.invoke(
+            'update-node',
+            editingNode.id.toString(),
+            editTitle,
+            editContent,
+            editingNode.status || 'pending',
+            editingNode.type,
+            node.position.x,
+            node.position.y
+        );
+
+        if (response.status === 'success') {
+            setNodes((nds) =>
+                nds.map((n) =>
+                    n.id === editingNode.id?.toString()
+                        ? {
+                            ...n,
+                            data: {
+                                ...n.data,
+                                title: editTitle,
+                                description: editContent,
+                                content: editContent,
+                                onDelete: handleDeleteNode,
+                                onEdit: openEditModal,
+                            },
+                        }
+                        : n
+                )
+            );
+            setIsEditModalOpen(false);
+            setEditingNode(null);
+        } else {
+            console.error('Failed to update node:', response.message);
+        }
+    };
+
     const fetchNodes = async (roadmapId: number) => {
         const response: any = await window.ipcRenderer.invoke('get-roadmap-nodes', roadmapId)
         if (response.status === 'success') {
@@ -126,7 +192,9 @@ function RoadMap() {
                     url: node.url,
                     dueDate: node.due_date,
                     created_at: node.created_at,
-                    updated_at: node.updated_at || null
+                    updated_at: node.updated_at || null,
+                    onDelete: handleDeleteNode,
+                    onEdit: openEditModal,
                 },
             }));
             setNodes(formattedNodes);
@@ -165,7 +233,9 @@ function RoadMap() {
                             roadmapId: newNodeData.roadmap_id,
                             type: newNodeData.type_id,
                             created_at: newNodeData.created_at,
-                            updated_at: newNodeData.updated_at || null
+                            updated_at: newNodeData.updated_at || null,
+                            onDelete: handleDeleteNode,
+                            onEdit: openEditModal,
                         },
                     };
                     setNodes((nds) => nds.concat(newNode));
@@ -188,7 +258,9 @@ function RoadMap() {
                             roadmapId: newNodeData.roadmap_id,
                             type: newNodeData.type_id,
                             created_at: newNodeData.created_at,
-                            updated_at: newNodeData.updated_at || null
+                            updated_at: newNodeData.updated_at || null,
+                            onDelete: handleDeleteNode,
+                            onEdit: openEditModal,
                         },
                     };
                     setNodes((nds) => nds.concat(newNode));
@@ -212,13 +284,16 @@ function RoadMap() {
                             type: newNodeData.type_id,
                             url: newNodeData.url,
                             created_at: newNodeData.created_at,
-                            updated_at: newNodeData.updated_at || null
+                            updated_at: newNodeData.updated_at || null,
+                            onDelete: handleDeleteNode,
+                            onEdit: openEditModal,
                         },
                     };
                     setNodes((nds) => nds.concat(newNode));
                 }
                 break;
             case NODE_TYPES.MILESTONENODE:
+                console.log('Adding milestone with due date:', nodeDueDate);
                 const milestoneResponse: any = await window.ipcRenderer.invoke('add-milestone-node', selectedRoadmap?.id, nodeTitle, nodeDescription, nodeDueDate, nodeType, position.x, position.y)
                 if (milestoneResponse.status === 'success') {
                     const newNodeData = milestoneResponse.data;
@@ -236,7 +311,9 @@ function RoadMap() {
                             type: newNodeData.type_id,
                             dueDate: newNodeData.due_date,
                             created_at: newNodeData.created_at,
-                            updated_at: newNodeData.updated_at || null
+                            updated_at: newNodeData.updated_at || null,
+                            onDelete: handleDeleteNode,
+                            onEdit: openEditModal,
                         },
                     };
                     setNodes((nds) => nds.concat(newNode));
@@ -529,6 +606,63 @@ function RoadMap() {
                                     className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 font-medium"
                                 >
                                     Add Node
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* Edit Node Modal */}
+            {isEditModalOpen && editingNode && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm transition-all duration-300">
+                    <div className="absolute inset-0" onClick={() => { setIsEditModalOpen(false); setEditingNode(null); }}></div>
+
+                    <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-2xl w-96 transform transition-all scale-100 relative z-10 border border-gray-200 dark:border-gray-700">
+                        <div className="flex items-center gap-3 mb-6">
+                            <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+                                <FiEdit2 className="text-xl text-blue-600" />
+                            </div>
+                            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Edit Node</h2>
+                        </div>
+
+                        <form onSubmit={handleUpdateNode}>
+                            <div className="mb-4">
+                                <label className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1'>Title</label>
+                                <input
+                                    type="text"
+                                    value={editTitle}
+                                    onChange={(e) => setEditTitle(e.target.value)}
+                                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all dark:bg-gray-700 dark:text-white"
+                                    placeholder="Node title"
+                                    autoFocus
+                                />
+                            </div>
+
+                            <div className="mb-6">
+                                <label className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1'>Description</label>
+                                <textarea
+                                    value={editContent}
+                                    onChange={(e) => setEditContent(e.target.value)}
+                                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all dark:bg-gray-700 dark:text-white resize-none"
+                                    placeholder="Brief description..."
+                                    rows={3}
+                                />
+                            </div>
+
+                            <div className="flex justify-end gap-3">
+                                <button
+                                    type="button"
+                                    onClick={() => { setIsEditModalOpen(false); setEditingNode(null); }}
+                                    className="px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors font-medium"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 font-medium"
+                                >
+                                    Save Changes
                                 </button>
                             </div>
                         </form>

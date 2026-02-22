@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url'
 import { ipcMain } from 'electron'
 import path from 'node:path'
 import { getTodos, addTodo, deleteTodo, updateTodo } from './services/db.ts'
-import { getRoadmaps, addRoadmap, deleteRoadmap, getRoadmapNodes, addTaskNode, addResourceNode, addNoteNode, addMilestoneNode, deleteNode, updateNode } from './services/roadmap.ts'
+import { getRoadmaps, addRoadmap, deleteRoadmap, getRoadmapNodes, addTaskNode, addResourceNode, addNoteNode, addMilestoneNode, deleteNode, updateNode, updateNodePosition } from './services/roadmap.ts'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -97,6 +97,8 @@ app.whenReady().then(() => {
   ipcMain.handle('delete-node', (_event, id) => deleteNode(id));
 
   ipcMain.handle('update-node', (_event, id, title, content, status, type, positionX, positionY) => updateNode(id, title, content, status, type, positionX, positionY));
+
+  ipcMain.handle('update-node-position', (_event, id, positionX, positionY) => updateNodePosition(id, positionX, positionY));
 
 
   createWindow();

@@ -33,5 +33,6 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
   addNoteNode: (roadmapId: number, title: string, content: string, type: number, positionX: number, positionY: number) => ipcRenderer.invoke("add-note-node", roadmapId, title, content, type, positionX, positionY),
   addMilestoneNode: (roadmapId: number, title: string, content: string, dueDate: string, type: number, positionX: number, positionY: number) => ipcRenderer.invoke("add-milestone-node", roadmapId, title, content, dueDate, type, positionX, positionY),
   deleteNode: (id: string) => ipcRenderer.invoke("delete-node", id),
-  updateNode: (id: string, title: string, content: string, status: string, type: number, positionX: number, positionY: number) => ipcRenderer.invoke("update-node", id, title, content, status, type, positionX, positionY)
+  updateNode: (id: string, title: string, content: string, status: string, type: number, positionX: number, positionY: number) => ipcRenderer.invoke("update-node", id, title, content, status, type, positionX, positionY),
+  updateNodePosition: (id: string, positionX: number, positionY: number) => ipcRenderer.invoke("update-node-position", id, positionX, positionY)
 })

@@ -174,3 +174,14 @@ export async function updateNode(id: string, title: string, content: string, sta
         return { status: "an error occurred", message: (error as Error).message };
     }
 }
+
+export async function updateNodePosition(id: string, positionX: number, positionY: number) {
+    try {
+        const updated_at = new Date().toISOString();
+        const stmt = db.prepare('UPDATE nodes SET position_x = ?, position_y = ?, updated_at = ? WHERE id = ?');
+        stmt.run(positionX, positionY, updated_at, id);
+        return { status: 'success', message: 'Node position updated successfully' };
+    } catch (error) {
+        return { status: "an error occurred", message: (error as Error).message };
+    }
+};

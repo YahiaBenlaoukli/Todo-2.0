@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ReactFlow, addEdge, Background, Controls, MiniMap, useNodesState, useEdgesState, Node, Edge, useReactFlow } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import Navbar from '../components/Navbar';
@@ -9,10 +9,12 @@ import MilestoneNode from '../components/FlowNodes/MilestoneNode';
 import { NODE_TYPES, type NodeType } from '../../electron/services/types';
 import type { Roadmap } from '../../electron/services/types';
 import { FiPlus, FiTrash2, FiArrowLeft, FiMap, FiEdit2 } from 'react-icons/fi';
+import { on } from 'node:events';
 
 
 function RoadMap() {
     const [nodes, setNodes, onNodesChange] = useNodesState([] as Node[]);
+    const dirtyNodes = useRef<Set<string>>(new Set());
     const [edges, setEdges, onEdgesChange] = useEdgesState([] as Edge[]);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -31,14 +33,42 @@ function RoadMap() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
 
-    // Edit node modal state
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [editingNode, setEditingNode] = useState<any>(null);
     const [editTitle, setEditTitle] = useState('');
     const [editContent, setEditContent] = useState('');
 
+    ///built in handlers
+    const onConnect = useCallback(
+        (params: any) => setEdges((eds) => addEdge(params, eds)),
+        [setEdges],
+    );
 
+    //UI Handlers
+    const handleCreateSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!newRoadmapName.trim()) return;
+        handleAddRoadmap(newRoadmapName.trim());
+        setNewRoadmapName('');
+        setShowCreateModal(false);
+    }
 
+    const handleBackToLanding = async () => {
+        await saveAllNodePositions();
+        setSelectedRoadmap(null);
+        setNodes([]);
+        setEdges([]);
+    }
+
+    const closeMenu = () => {
+        setIsMenuOpen(false);
+        setNodeTitle('');
+        setNodeDescription('');
+        setNodeType(NODE_TYPES.TASKNODE);
+        setNodeUrl('');
+        setNodeDueDate('');
+    }
+    // Roadmap handlers
     const fetchRoadmaps = async () => {
         const response: any = await window.ipcRenderer.invoke('get-roadmaps')
         if (response.status === 'success') {
@@ -72,13 +102,6 @@ function RoadMap() {
         }
     }
 
-    const handleCreateSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!newRoadmapName.trim()) return;
-        handleAddRoadmap(newRoadmapName.trim());
-        setNewRoadmapName('');
-        setShowCreateModal(false);
-    }
 
     const handleSelectRoadmap = (roadmap: Roadmap) => {
         setSelectedRoadmap(roadmap);
@@ -86,17 +109,7 @@ function RoadMap() {
         setEdges([]);
     }
 
-    const handleBackToLanding = () => {
-        setSelectedRoadmap(null);
-        setNodes([]);
-        setEdges([]);
-    }
-
-    const onConnect = useCallback(
-        (params: any) => setEdges((eds) => addEdge(params, eds)),
-        [setEdges],
-    );
-
+    // Node handlers
     const nodeTypes = useMemo(() => ({
         custom: TaskNode,
         taskNode: TaskNode,
@@ -326,14 +339,54 @@ function RoadMap() {
         closeMenu();
     }
 
-    const closeMenu = () => {
-        setIsMenuOpen(false);
-        setNodeTitle('');
-        setNodeDescription('');
-        setNodeType(NODE_TYPES.TASKNODE);
-        setNodeUrl('');
-        setNodeDueDate('');
+    const handleNodeChange = (changes: any[]) => {
+
+        onNodesChange(changes);
+
+        changes.forEach((change) => {
+            if (change.type === 'position' && change.position) {
+                dirtyNodes.current.add(change.id);
+            }
+        }
+        );
     }
+
+    const saveAllNodePositions = async () => {
+        const updatedNodes = nodes.filter(node =>
+            dirtyNodes.current.has(node.id)
+        );
+        if (updatedNodes.length === 0) return;
+        console.log('Saving node positions:', updatedNodes);
+
+        await Promise.all(
+            updatedNodes.map(n =>
+                window.ipcRenderer.invoke(
+                    "update-node-position",
+                    n.id,
+                    n.position.x,
+                    n.position.y
+                )
+            )
+        );
+
+        dirtyNodes.current.clear();
+    };
+
+    const saveRef = useRef(saveAllNodePositions);
+    useEffect(() => {
+        saveRef.current = saveAllNodePositions;
+    });
+
+    useEffect(() => {
+        const handleBeforeUnload = () => {
+            saveRef.current();
+        };
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+            saveRef.current();
+        };
+    }, []);
 
     const handlePaneRightClick = useCallback(
         (event: MouseEvent | React.MouseEvent) => {
@@ -691,7 +744,7 @@ function RoadMap() {
                 <ReactFlow
                     nodes={nodes}
                     edges={edges}
-                    onNodesChange={onNodesChange}
+                    onNodesChange={handleNodeChange}
                     onEdgesChange={onEdgesChange}
                     onConnect={onConnect}
                     nodeTypes={nodeTypes}

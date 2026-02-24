@@ -1,3 +1,6 @@
+/**
+ * Service for Roadmap-specific database operations, including nodes and edges.
+ */
 import Database from 'better-sqlite3'
 const db = new Database('todo2.0.db', { verbose: console.log })
 db.pragma('journal_mode = WAL');

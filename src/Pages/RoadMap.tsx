@@ -1,21 +1,23 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ReactFlow, addEdge, Background, Controls, MiniMap, useNodesState, useEdgesState, Node, Edge, useReactFlow } from '@xyflow/react';
+import { ReactFlow, Background, Controls, MiniMap, useNodesState, useEdgesState, Node, Edge, useReactFlow } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import Navbar from '../components/Navbar';
 import TaskNode from '../components/FlowNodes/TaskNode';
 import ResourceNode from '../components/FlowNodes/ResourceNode';
 import NoteNode from '../components/FlowNodes/NoteNode';
 import MilestoneNode from '../components/FlowNodes/MilestoneNode';
-import { NODE_TYPES, type NodeType } from '../../electron/services/types';
+import { NODE_TYPES, type NodeType, EDGE_TYPES, type EdgeType } from '../../electron/services/types';
 import type { Roadmap } from '../../electron/services/types';
 import { FiPlus, FiTrash2, FiArrowLeft, FiMap, FiEdit2 } from 'react-icons/fi';
-import { on } from 'node:events';
+
+import { ipcRenderer } from 'electron';
 
 
 function RoadMap() {
     const [nodes, setNodes, onNodesChange] = useNodesState([] as Node[]);
     const dirtyNodes = useRef<Set<string>>(new Set());
     const [edges, setEdges, onEdgesChange] = useEdgesState([] as Edge[]);
+    const changedEdgeIds = useRef<Set<string>>(new Set());
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [position, setPosition] = useState({ x: 0, y: 0 });
     const { screenToFlowPosition } = useReactFlow();
@@ -38,10 +40,41 @@ function RoadMap() {
     const [editTitle, setEditTitle] = useState('');
     const [editContent, setEditContent] = useState('');
 
+    const edgeOrder = [
+        EDGE_TYPES.STRAIGHT,
+        EDGE_TYPES.STEP,
+        EDGE_TYPES.SMOOTHSTEP,
+        EDGE_TYPES.BEZIER
+    ];
+
     ///built in handlers
     const onConnect = useCallback(
-        (params: any) => setEdges((eds) => addEdge(params, eds)),
+        async (params: any) => {
+            await window.ipcRenderer.invoke('add-edge', params.source, params.target, EDGE_TYPES.STRAIGHT).then((response: any) => {
+                if (response.status === 'success') {
+                    const newEdgeData = response.data;
+                    const newEdge: Edge = {
+                        id: newEdgeData.id.toString(),
+                        source: newEdgeData.source.toString(),
+                        target: newEdgeData.target.toString(),
+                        type: 'smoothstep',
+                        data: {
+                            id: newEdgeData.id,
+                            source: newEdgeData.source,
+                            target: newEdgeData.target,
+                            type: newEdgeData.type_id,
+                            created_at: newEdgeData.created_at,
+                            updated_at: newEdgeData.updated_at || null,
+                        },
+                    };
+                    setEdges((eds) => eds.concat(newEdge));
+                } else {
+                    console.error('Failed to add edge:', response.message);
+                }
+            });
+        },
         [setEdges],
+
     );
 
     //UI Handlers
@@ -55,6 +88,7 @@ function RoadMap() {
 
     const handleBackToLanding = async () => {
         await saveAllNodePositions();
+        await saveAllEdgeDeletions();
         setSelectedRoadmap(null);
         setNodes([]);
         setEdges([]);
@@ -128,6 +162,18 @@ function RoadMap() {
         }
     };
 
+    const getEdgeTypeString = (type: EdgeType): string => {
+        switch (type) {
+            case EDGE_TYPES.STRAIGHT: return 'straight';
+            case EDGE_TYPES.STEP: return 'step';
+            case EDGE_TYPES.SMOOTHSTEP: return 'smoothstep';
+            case EDGE_TYPES.BEZIER: return 'bezier';
+            default: return 'custom';
+        }
+    };
+
+
+
     const handleDeleteNode = async (nodeId: string) => {
         const response: any = await window.ipcRenderer.invoke('delete-node', nodeId);
         if (response.status === 'success') {
@@ -157,7 +203,6 @@ function RoadMap() {
             editTitle,
             editContent,
             editingNode.status || 'pending',
-            editingNode.type,
             node.position.x,
             node.position.y
         );
@@ -188,7 +233,7 @@ function RoadMap() {
     };
 
     const fetchNodes = async (roadmapId: number) => {
-        const response: any = await window.ipcRenderer.invoke('get-roadmap-nodes', roadmapId)
+        const response: any = await window.ipcRenderer.invoke('get-roadmap-nodes', roadmapId);
         if (response.status === 'success') {
             const nodesData = response.data;
             const formattedNodes = nodesData.map((node: any) => ({
@@ -219,6 +264,7 @@ function RoadMap() {
     useEffect(() => {
         if (selectedRoadmap) {
             fetchNodes(selectedRoadmap.id);
+            fetchEdges(selectedRoadmap.id);
         }
     }, [selectedRoadmap]);
 
@@ -359,8 +405,8 @@ function RoadMap() {
         console.log('Saving node positions:', updatedNodes);
 
         await Promise.all(
-            updatedNodes.map(n =>
-                window.ipcRenderer.invoke(
+            updatedNodes.map(async n =>
+                await window.ipcRenderer.invoke(
                     "update-node-position",
                     n.id,
                     n.position.x,
@@ -372,21 +418,115 @@ function RoadMap() {
         dirtyNodes.current.clear();
     };
 
+
+
+    //edge handlers
+    const fetchEdges = async (roadMapId: number) => {
+        try {
+            const response: any = await window.ipcRenderer.invoke('get-roadmap-edges', roadMapId);
+            if (response.status === 'success') {
+                const edgesData = response.data;
+                const formattedEdges = edgesData.map((edge: any) => ({
+                    id: edge.id.toString(),
+                    source: edge.source.toString(),
+                    target: edge.target.toString(),
+                    type: getEdgeTypeString(edge.type_id),
+                    data: {
+                        id: edge.id,
+                        source: edge.source,
+                        target: edge.target,
+                        type: edge.type_id,
+                        created_at: edge.created_at,
+                        updated_at: edge.updated_at || null,
+                    },
+                }));
+                setEdges(formattedEdges);
+            } else {
+                console.error('Failed to fetch edges:', response.message);
+            }
+        } catch (error) {
+            console.error('Failed to fetch edges:', error)
+        }
+    }
+
+    const handleDeleteEdge = async (DeletedEdges: Edge[]) => {
+        try {
+            await window.ipcRenderer.invoke("delete-edge", DeletedEdges[0].id);
+        }
+        catch (error) {
+            console.log(error);
+        }
+    }
+
+
+    const saveAllEdgeDeletions = async () => {
+        const changedEdges = edges.filter(edge => changedEdgeIds.current.has(edge.id));
+
+        if (changedEdges.length === 0) return;
+        console.log('Saving edge type changes:', changedEdges);
+
+        await Promise.all(
+            changedEdges.map(e =>
+                window.ipcRenderer.invoke(
+                    "update-edge-type",
+                    e.id,
+                    e.data?.type
+                )
+            )
+        );
+
+        changedEdgeIds.current.clear();
+    };
+
     const saveRef = useRef(saveAllNodePositions);
+    const saveEdgeRef = useRef(saveAllEdgeDeletions);
     useEffect(() => {
         saveRef.current = saveAllNodePositions;
+        saveEdgeRef.current = saveAllEdgeDeletions;
     });
 
     useEffect(() => {
         const handleBeforeUnload = () => {
             saveRef.current();
+            saveEdgeRef.current();
         };
         window.addEventListener('beforeunload', handleBeforeUnload);
         return () => {
             window.removeEventListener('beforeunload', handleBeforeUnload);
             saveRef.current();
+            saveEdgeRef.current();
         };
     }, []);
+
+    const handleEdgeClick = (
+        event: React.MouseEvent,
+        edge: Edge
+    ) => {
+        setEdges((eds) =>
+            eds.map((e) => {
+                if (e.id !== edge.id) return e;
+
+                const currentType = e.data?.type as EdgeType;
+                const index = edgeOrder.indexOf(currentType);
+                const nextType =
+                    edgeOrder[(index + 1) % edgeOrder.length];
+
+                changedEdgeIds.current.add(e.id);
+
+                return {
+                    ...e,
+                    type: getEdgeTypeString(nextType),
+                    data: {
+                        ...e.data,
+                        type: nextType
+                    }
+                };
+            })
+        );
+    };
+
+
+
 
     const handlePaneRightClick = useCallback(
         (event: MouseEvent | React.MouseEvent) => {
@@ -666,7 +806,7 @@ function RoadMap() {
                 </div>
             )}
 
-            {/* Edit Node Modal */}
+
             {isEditModalOpen && editingNode && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm transition-all duration-300">
                     <div className="absolute inset-0" onClick={() => { setIsEditModalOpen(false); setEditingNode(null); }}></div>
@@ -746,6 +886,8 @@ function RoadMap() {
                     edges={edges}
                     onNodesChange={handleNodeChange}
                     onEdgesChange={onEdgesChange}
+                    onEdgesDelete={handleDeleteEdge}
+                    onEdgeClick={handleEdgeClick}
                     onConnect={onConnect}
                     nodeTypes={nodeTypes}
                     onPaneContextMenu={handlePaneRightClick}

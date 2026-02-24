@@ -185,3 +185,49 @@ export async function updateNodePosition(id: string, positionX: number, position
         return { status: "an error occurred", message: (error as Error).message };
     }
 };
+
+export async function addEdge(source: number, target: number, type: number) {
+    try {
+        const created_at = new Date().toISOString();
+        const stmt = db.prepare('INSERT INTO edges (source,target,type_id,created_at) VALUES (?,?,?,?)');
+        const result = stmt.run(source, target, type, created_at);
+        const newEdge = db.prepare('SELECT * FROM edges WHERE id = ?').get(result.lastInsertRowid);
+        return { status: 'success', message: 'Edge added successfully', data: newEdge };
+    }
+    catch (error) {
+        return { status: "an error occurred", message: (error as Error).message };
+    }
+}
+
+export async function deleteEdge(id: number) {
+    try {
+        const stmt = db.prepare('DELETE FROM edges WHERE id = ?');
+        stmt.run(id);
+        return { status: 'success', message: 'Edge deleted successfully' };
+    } catch (error) {
+        return { status: "an error occurred", message: (error as Error).message };
+    }
+}
+
+export async function getEdges(roadmapId: number) {
+    try {
+        const stmt = db.prepare(`SELECT e.id, e.source, e.target, e.type_id, e.created_at
+        FROM edges e
+        JOIN nodes n ON (e.source = n.id OR e.target = n.id)
+        WHERE n.roadmap_id = ?`);
+        const edges = stmt.all(roadmapId);
+        return { status: 'success', data: edges };
+    } catch (error) {
+        return { status: "an error occurred", message: (error as Error).message };
+    }
+}
+
+export async function updateEdge(id: number, type: number) {
+    try {
+        const stmt = db.prepare('UPDATE edges SET type_id = ? WHERE id = ?');
+        stmt.run(type, id);
+        return { status: 'success', message: 'Edge updated successfully' };
+    } catch (error) {
+        return { status: "an error occurred", message: (error as Error).message };
+    }
+}

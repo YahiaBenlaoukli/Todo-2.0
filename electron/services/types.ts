@@ -19,6 +19,16 @@ export const NODE_TYPES = {
     MILESTONENODE: 4
 } as const;
 
+export const EDGE_TYPES = {
+    STRAIGHT: 1,
+    STEP: 2,
+    SMOOTHSTEP: 3,
+    BEZIER: 4
+} as const;
+
+export type EdgeType =
+    typeof EDGE_TYPES[keyof typeof EDGE_TYPES];
+
 export type NodeType =
     typeof NODE_TYPES[keyof typeof NODE_TYPES];
 

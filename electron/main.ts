@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url'
 import { ipcMain } from 'electron'
 import path from 'node:path'
 import { getTodos, addTodo, deleteTodo, updateTodo } from './services/db.ts'
-import { getRoadmaps, addRoadmap, deleteRoadmap, getRoadmapNodes, addTaskNode, addResourceNode, addNoteNode, addMilestoneNode, deleteNode, updateNode, updateNodePosition } from './services/roadmap.ts'
+import { getRoadmaps, addRoadmap, deleteRoadmap, getRoadmapNodes, addTaskNode, addResourceNode, addNoteNode, addMilestoneNode, deleteNode, updateNode, updateNodePosition, addEdge, deleteEdge, updateEdge, getEdges } from './services/roadmap.ts'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -96,9 +96,17 @@ app.whenReady().then(() => {
 
   ipcMain.handle('delete-node', (_event, id) => deleteNode(id));
 
-  ipcMain.handle('update-node', (_event, id, title, content, status, type, positionX, positionY) => updateNode(id, title, content, status, type, positionX, positionY));
+  ipcMain.handle('update-node', (_event, id, title, content, status, positionX, positionY) => updateNode(id, title, content, status, positionX, positionY));
 
   ipcMain.handle('update-node-position', (_event, id, positionX, positionY) => updateNodePosition(id, positionX, positionY));
+
+  ipcMain.handle('get-roadmap-edges', (_event, roadmapId) => getEdges(roadmapId));
+
+  ipcMain.handle('add-edge', (_event, sourceId, targetId, type) => addEdge(sourceId, targetId, type));
+
+  ipcMain.handle('delete-edge', (_event, id) => deleteEdge(id));
+
+  ipcMain.handle('update-edge-type', (_event, id, type) => updateEdge(id, type));
 
 
   createWindow();

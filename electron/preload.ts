@@ -1,6 +1,6 @@
 import { ipcRenderer, contextBridge } from 'electron'
 import type { todo } from './services/types.ts'
-import { addNoteNode, addResourceNode, addTaskNode, updateNode } from './services/roadmap.ts'
+import { addEdge, addNoteNode, addResourceNode, addTaskNode, updateNode } from './services/roadmap.ts'
 
 // --------- Expose some API to the Renderer process ---------
 contextBridge.exposeInMainWorld('ipcRenderer', {
@@ -34,5 +34,9 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
   addMilestoneNode: (roadmapId: number, title: string, content: string, dueDate: string, type: number, positionX: number, positionY: number) => ipcRenderer.invoke("add-milestone-node", roadmapId, title, content, dueDate, type, positionX, positionY),
   deleteNode: (id: string) => ipcRenderer.invoke("delete-node", id),
   updateNode: (id: string, title: string, content: string, status: string, type: number, positionX: number, positionY: number) => ipcRenderer.invoke("update-node", id, title, content, status, type, positionX, positionY),
-  updateNodePosition: (id: string, positionX: number, positionY: number) => ipcRenderer.invoke("update-node-position", id, positionX, positionY)
+  updateNodePosition: (id: string, positionX: number, positionY: number) => ipcRenderer.invoke("update-node-position", id, positionX, positionY),
+  getEdges: (roadmapId: number) => ipcRenderer.invoke("get-roadmap-edges", roadmapId),
+  addEdge: (sourceId: number, targetId: number, type: number) => ipcRenderer.invoke("add-edge", sourceId, targetId, type),
+  deleteEdge: (id: number) => ipcRenderer.invoke("delete-edge", id),
+  updateEdge: (id: number, type: number) => ipcRenderer.invoke("update-edge-type", id, type)
 })

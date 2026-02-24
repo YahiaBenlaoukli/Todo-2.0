@@ -1,6 +1,4 @@
-/**
- * Service for general Todo task database operations.
- */
+
 import Database from 'better-sqlite3'
 const db = new Database('todo2.0.db', { verbose: console.log })
 db.pragma('journal_mode = WAL');

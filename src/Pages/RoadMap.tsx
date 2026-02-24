@@ -12,10 +12,7 @@ import { FiPlus, FiTrash2, FiArrowLeft, FiMap, FiEdit2 } from 'react-icons/fi';
 
 import { ipcRenderer } from 'electron';
 
-/**
- * RoadMap component provides an interactive canvas for creating and managing visual roadmaps.
- * Uses React Flow for the graph visualization and interacts with the main process via IPC for persistence.
- */
+
 function RoadMap() {
     const [nodes, setNodes, onNodesChange] = useNodesState([] as Node[]);
     const dirtyNodes = useRef<Set<string>>(new Set());

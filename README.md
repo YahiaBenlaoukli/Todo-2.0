@@ -72,4 +72,4 @@ The application uses **SQLite** for persistence. The database file `todo2.0.db` 
 The schema is defined in `electron/services/db.ts` (for tasks) and `electron/services/roadmap.ts` (for roadmaps and nodes). You can find commented-out SQL commands in these files if you need to manually initialize or reset the database.
 
 ---
-*Created with ❤️ by Yahia Benlaoukli*
+*Created by Yahia Benlaoukli*

@@ -223,7 +223,7 @@ export async function getEdges(roadmapId: number) {
     }
 }
 
-export async function updateEdge(id: number, type: number) {
+export async function updateEdge(id: number, type: number): Promise<Record<string, string>> {
     try {
         const stmt = db.prepare('UPDATE edges SET type_id = ? WHERE id = ?');
         stmt.run(type, id);

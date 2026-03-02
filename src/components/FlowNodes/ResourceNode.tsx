@@ -6,7 +6,6 @@ import { FiLink, FiEdit2, FiTrash2 } from 'react-icons/fi';
 const ResourceNode = ({ data }: { data: { id: number; roadmapId: number; description?: string; title: string; content?: string; type: NodeType; url?: string; onDelete?: (id: string) => void; onEdit?: (data: any) => void; } }) => {
     return (
         <div className="group relative px-4 py-3 shadow-lg rounded-xl bg-white border-l-4 border-emerald-500 min-w-[180px] max-w-[260px] hover:shadow-xl transition-shadow">
-            {/* Hover action buttons */}
             <div className="absolute -top-3 -right-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-all duration-200 z-10">
                 <button
                     onClick={(e) => { e.stopPropagation(); data.onEdit?.(data); }}

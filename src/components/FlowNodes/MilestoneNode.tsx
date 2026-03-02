@@ -8,7 +8,6 @@ const MilestoneNode = ({ data }: { data: { id: number; roadmapId: number; descri
 
     return (
         <div className="group relative px-4 py-3 shadow-lg rounded-xl bg-gradient-to-br from-purple-50 to-white border-l-4 border-purple-500 min-w-[180px] max-w-[260px] hover:shadow-xl transition-shadow">
-            {/* Hover action buttons */}
             <div className="absolute -top-3 -right-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-all duration-200 z-10">
                 <button
                     onClick={(e) => { e.stopPropagation(); data.onEdit?.(data); }}

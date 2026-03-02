@@ -449,9 +449,24 @@ function RoadMap() {
         }
     }
 
-    const handleDeleteEdge = async (DeletedEdges: Edge[]) => {
+    const handleDeleteEdge = async (deletedEdges: Edge[]) => {
+        console.log('Deleting edges:', deletedEdges);
         try {
-            await window.ipcRenderer.invoke("delete-edge", DeletedEdges[0].id);
+            await Promise.all(
+                deletedEdges.map(edge => window.ipcRenderer.invoke("delete-edge", edge.id))
+            );
+        }
+        catch (error) {
+            console.log(error);
+        }
+    }
+
+    const handleEdgeContextMenu = async (event: React.MouseEvent, edge: Edge) => {
+        event.preventDefault();
+        console.log('Right-click deleting edge:', edge);
+        try {
+            await window.ipcRenderer.invoke("delete-edge", edge.id);
+            setEdges((eds) => eds.filter((e) => e.id !== edge.id));
         }
         catch (error) {
             console.log(error);
@@ -502,6 +517,9 @@ function RoadMap() {
         event: React.MouseEvent,
         edge: Edge
     ) => {
+        event.preventDefault();
+
+        console.log('Left-clicked edge:', edge);
         setEdges((eds) =>
             eds.map((e) => {
                 if (e.id !== edge.id) return e;
@@ -521,8 +539,9 @@ function RoadMap() {
                         type: nextType
                     }
                 };
-            })
-        );
+            }
+            )
+        )
     };
 
 
@@ -888,6 +907,7 @@ function RoadMap() {
                     onEdgesChange={onEdgesChange}
                     onEdgesDelete={handleDeleteEdge}
                     onEdgeClick={handleEdgeClick}
+                    onEdgeContextMenu={handleEdgeContextMenu}
                     onConnect={onConnect}
                     nodeTypes={nodeTypes}
                     onPaneContextMenu={handlePaneRightClick}

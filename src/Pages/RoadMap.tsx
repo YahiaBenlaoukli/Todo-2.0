@@ -32,7 +32,7 @@ function RoadMap() {
 
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [newRoadmapName, setNewRoadmapName] = useState('');
-    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
     const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
 
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -565,9 +565,9 @@ function RoadMap() {
     if (!selectedRoadmap) {
         return (
             <div className="min-h-screen bg-gray-50">
-                <Navbar isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} />
+                <Navbar />
 
-                <div className={`${isSidebarOpen ? 'md:ml-64' : 'ml-0'} min-h-screen transition-all duration-300`}>
+                <div className="ml-0 md:ml-14 min-h-screen pb-16 md:pb-0">
                     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
                         <div className="flex justify-between items-center mb-10">
                             <div>

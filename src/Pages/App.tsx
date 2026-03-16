@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
 
 import Navbar from '../components/Navbar.tsx'
-import CreateTodoModal from '../components/CreateTodoModal.tsx'
-import EditTodoModal from '../components/EditTodoModal.tsx'
-import TodoItem from '../components/TodoItem.tsx'
+import CreateTodoModal from '../components/Todo/CreateTodoModal.tsx'
+import EditTodoModal from '../components/Todo/EditTodoModal.tsx'
+import TodoItem from '../components/Todo/TodoItem.tsx'
 
 import type { todo } from '../../electron/services/types.ts'
 import { FiEdit2, FiPlus } from 'react-icons/fi'
@@ -14,7 +14,7 @@ function App() {
   const [showPopUpSection, setShowPopUpSection] = useState<boolean>(false)
   const [showEditSection, SetEditSection] = useState<boolean>(false)
   const [updateTodo, setUpdateTodo] = useState<todo | null>(null)
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true)
+
 
 
   const fetchTodos = async () => {
@@ -76,9 +76,9 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} />
+      <Navbar />
 
-      <div className={`${isSidebarOpen ? 'md:ml-64' : 'ml-0'} min-h-screen transition-all duration-300`}>
+      <div className="ml-0 md:ml-14 min-h-screen pb-16 md:pb-0">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
           <div className="flex justify-between items-center mb-10">
             <div>

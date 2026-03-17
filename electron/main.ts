@@ -4,6 +4,7 @@ import { ipcMain } from 'electron'
 import path from 'node:path'
 import { getTodos, addTodo, deleteTodo, updateTodo } from './services/db.ts'
 import { getRoadmaps, addRoadmap, deleteRoadmap, getRoadmapNodes, addTaskNode, addResourceNode, addNoteNode, addMilestoneNode, deleteNode, updateNode, updateNodePosition, addEdge, deleteEdge, updateEdge, getEdges } from './services/roadmap.ts'
+import { getFiles, getFileContent, createFile, deleteFile, updateFile, renameFile, createFolder, deleteFolder, renameFolder, copyFile, moveFile, moveFolder } from './services/explorer.ts'
 
 
 const __filename = fileURLToPath(import.meta.url)
@@ -109,6 +110,19 @@ app.whenReady().then(() => {
   ipcMain.handle('delete-edge', (_event, id) => deleteEdge(id));
 
   ipcMain.handle('update-edge-type', (_event, id, type) => updateEdge(id, type));
+
+  ipcMain.handle('get-files', () => getFiles());
+  ipcMain.handle('get-file-content', (_event, filePath) => getFileContent(filePath));
+  ipcMain.handle('create-file', (_event, filePath) => createFile(filePath));
+  ipcMain.handle('delete-file', (_event, filePath) => deleteFile(filePath));
+  ipcMain.handle('update-file', (_event, filePath, content) => updateFile(filePath, content));
+  ipcMain.handle('rename-file', (_event, filePath, newName) => renameFile(filePath, newName));
+  ipcMain.handle('create-folder', (_event, folderPath) => createFolder(folderPath));
+  ipcMain.handle('delete-folder', (_event, folderPath) => deleteFolder(folderPath));
+  ipcMain.handle('rename-folder', (_event, folderPath, newName) => renameFolder(folderPath, newName));
+  ipcMain.handle('move-file', (_event, src, dest) => moveFile(src, dest));
+  ipcMain.handle('move-folder', (_event, src, dest) => moveFolder(src, dest));
+  ipcMain.handle('copy-file', (_event, src, dest) => copyFile(src, dest));
 
   createWindow();
 });

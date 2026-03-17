@@ -77,4 +77,8 @@ export type MilestoneNode = {
 
 export type Node = TaskNode | NoteNode | ResourceNode | MilestoneNode;
 
-
+export type FileNode = {
+    name: string;
+    type: "file" | "folder";
+    children?: FileNode[];
+};

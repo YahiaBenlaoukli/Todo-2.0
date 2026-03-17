@@ -20,6 +20,7 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
     const [channel, ...omit] = args
     return ipcRenderer.invoke(channel, ...omit)
   },
+  //todos
   getTodos: () => ipcRenderer.invoke("get-todos"),
   addTodo: (taskName: string, taskDes: string) => ipcRenderer.invoke("add-todo", taskName, taskDes),
   deleteTodo: (id: number) => ipcRenderer.invoke("delete-todo", id),
@@ -38,5 +39,19 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
   getEdges: (roadmapId: number) => ipcRenderer.invoke("get-roadmap-edges", roadmapId),
   addEdge: (sourceId: number, targetId: number, type: number) => ipcRenderer.invoke("add-edge", sourceId, targetId, type),
   deleteEdge: (id: number) => ipcRenderer.invoke("delete-edge", id),
-  updateEdge: (id: number, type: number) => ipcRenderer.invoke("update-edge-type", id, type)
+  updateEdge: (id: number, type: number) => ipcRenderer.invoke("update-edge-type", id, type),
+
+  // Explorer
+  getFiles: () => ipcRenderer.invoke("get-files"),
+  getFileContent: (filePath: string) => ipcRenderer.invoke("get-file-content", filePath),
+  createFile: (filePath: string) => ipcRenderer.invoke("create-file", filePath),
+  deleteFile: (filePath: string) => ipcRenderer.invoke("delete-file", filePath),
+  updateFile: (filePath: string, content: string) => ipcRenderer.invoke("update-file", filePath, content),
+  renameFile: (filePath: string, newName: string) => ipcRenderer.invoke("rename-file", filePath, newName),
+  createFolder: (folderPath: string) => ipcRenderer.invoke("create-folder", folderPath),
+  deleteFolder: (folderPath: string) => ipcRenderer.invoke("delete-folder", folderPath),
+  renameFolder: (folderPath: string, newName: string) => ipcRenderer.invoke("rename-folder", folderPath, newName),
+  moveFile: (src: string, dest: string) => ipcRenderer.invoke("move-file", src, dest),
+  moveFolder: (src: string, dest: string) => ipcRenderer.invoke("move-folder", src, dest),
+  copyFile: (src: string, dest: string) => ipcRenderer.invoke("copy-file", src, dest),
 })

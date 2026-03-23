@@ -84,7 +84,7 @@ function FileExplorer({ onFileSelect }: FileExplorerProps = {}) {
     const handleInlineCreateSubmit = async (name: string) => {
         if (!creatingNode) return;
         let finalName = name.trim();
-        
+
         if (!finalName) {
             setCreatingNode(null);
             return;
@@ -271,10 +271,10 @@ export function InlineInput({ type, depth, initialValue = '', onSubmit, onCancel
             style={{ paddingLeft: `${paddingLeft}px` }}
         >
             <span className="w-4 shrink-0" />
-            
+
             {/* Visual Icon hint */}
             <span className="text-[#888888] shrink-0">
-               {type === 'folder' ? '📁' : '📄'}
+                {type === 'folder' ? '📁' : '📄'}
             </span>
 
             <input

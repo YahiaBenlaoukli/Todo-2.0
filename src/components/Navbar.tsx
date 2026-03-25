@@ -1,10 +1,12 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { FaTasks, FaHome, FaMap, FaHeadphonesAlt, FaPhone } from "react-icons/fa";
+import { FaTasks, FaHome, FaMap, FaHeadphonesAlt, FaPhone, FaMoon, FaSun } from "react-icons/fa";
 import { LuNotebookText } from "react-icons/lu";
+import { useTheme } from '../contexts/ThemeContext';
 
 const Navbar: React.FC = () => {
     const location = useLocation();
+    const { theme, toggleTheme } = useTheme();
 
     const isActive = (path: string) => location.pathname === path;
 
@@ -31,6 +33,16 @@ const Navbar: React.FC = () => {
 
                 {/* Bottom nav */}
                 <div className="flex flex-col items-center gap-1 mb-2">
+                    <button 
+                        onClick={toggleTheme}
+                        data-tooltip={theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+                        className="relative w-12 h-11 flex items-center justify-center rounded transition-colors duration-150 group text-text hover:text-white cursor-pointer"
+                    >
+                        {theme === 'dark' ? <FaSun size={18} /> : <FaMoon size={18} />}
+                        <span className="pointer-events-none absolute left-full ml-2 whitespace-nowrap bg-primary text-[#ffffff] text-xs px-2.5 py-1.5 rounded shadow-lg border border-[#454545] opacity-0 group-hover:opacity-100 transition-opacity duration-150 z-[60]">
+                            {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+                        </span>
+                    </button>
                     <NavItem to="/about" icon={<FaPhone size={18} />} label="About Us" active={isActive('/about')} />
                     <NavItem to="/contact" icon={<FaHeadphonesAlt size={18} />} label="Contact Us" active={isActive('/contact')} />
                 </div>
@@ -42,8 +54,10 @@ const Navbar: React.FC = () => {
                 <NavItemMobile to="/tasks" icon={<FaTasks size={18} />} label="Tasks" active={isActive('/tasks')} />
                 <NavItemMobile to="/roadmaps" icon={<FaMap size={18} />} label="Maps" active={isActive('/roadmaps')} />
                 <NavItemMobile to="/notes" icon={<LuNotebookText size={18} />} label="Notes" active={isActive('/notes')} />
-                <NavItemMobile to="/about" icon={<FaPhone size={16} />} label="About" active={isActive('/about')} />
-                <NavItemMobile to="/contact" icon={<FaHeadphonesAlt size={16} />} label="Contact" active={isActive('/contact')} />
+                <button onClick={toggleTheme} className="flex flex-col items-center justify-center gap-0.5 px-1 py-1 rounded transition-colors duration-150 text-[#858585] hover:text-white">
+                    {theme === 'dark' ? <FaSun size={16} /> : <FaMoon size={16} />}
+                    <span className="text-[10px] leading-tight">Theme</span>
+                </button>
             </nav>
         </>
     );

@@ -259,10 +259,11 @@ export async function exportRoadmap(roadmapId: number) {
     }
 }
 
-export async function importRoadmap(filePath: string) {
+export async function importRoadmapData(roadmapData: any) {
     try {
-        const roadmap = await fs.readFile(filePath, 'utf-8');
-        const roadmapData = JSON.parse(roadmap);
+        if (typeof roadmapData === 'string') {
+            roadmapData = JSON.parse(roadmapData);
+        }
         const stmt = db.prepare('INSERT INTO roadmaps (name, created_at) VALUES (?, ?)');
         const roadmapResult = stmt.run(
             roadmapData.roadmap.name,
@@ -297,6 +298,15 @@ export async function importRoadmap(filePath: string) {
             );
         }
         return { status: 'success', message: 'Roadmap imported successfully' };
+    } catch (error) {
+        return { status: "an error occurred", message: (error as Error).message };
+    }
+}
+
+export async function importRoadmap(filePath: string) {
+    try {
+        const fileContent = await fs.readFile(filePath, 'utf-8');
+        return await importRoadmapData(fileContent);
     } catch (error) {
         return { status: "an error occurred", message: (error as Error).message };
     }

@@ -3,9 +3,9 @@ import { fileURLToPath } from 'node:url'
 import { ipcMain } from 'electron'
 import path from 'node:path'
 import { getTodos, addTodo, deleteTodo, updateTodo } from './services/db.ts'
-import { getRoadmaps, addRoadmap, deleteRoadmap, getRoadmapNodes, addTaskNode, addResourceNode, addNoteNode, addMilestoneNode, deleteNode, updateNode, updateNodePosition, addEdge, deleteEdge, updateEdge, getEdges, exportRoadmap, importRoadmap } from './services/roadmap.ts'
+import { getRoadmaps, addRoadmap, deleteRoadmap, getRoadmapNodes, addTaskNode, addResourceNode, addNoteNode, addMilestoneNode, deleteNode, updateNode, updateNodePosition, addEdge, deleteEdge, updateEdge, getEdges, exportRoadmap, importRoadmap, importRoadmapData } from './services/roadmap.ts'
 import { getFiles, getFileContent, createFile, deleteFile, updateFile, renameFile, createFolder, deleteFolder, renameFolder, copyFile, moveFile, moveFolder } from './services/explorer.ts'
-
+import { generateRoadmap } from './services/ai/roadMapsGenerator.ts'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -111,6 +111,8 @@ app.whenReady().then(() => {
 
   ipcMain.handle('update-edge-type', (_event, id, type) => updateEdge(id, type));
 
+  ipcMain.handle('generate-roadmap', (_event, topic, difficulty, focus) => generateRoadmap(topic, difficulty, focus));
+
   ipcMain.handle('get-files', () => getFiles());
   ipcMain.handle('get-file-content', (_event, filePath) => getFileContent(filePath));
   ipcMain.handle('create-file', (_event, filePath) => createFile(filePath));
@@ -125,6 +127,7 @@ app.whenReady().then(() => {
   ipcMain.handle('copy-file', (_event, src, dest) => copyFile(src, dest));
   ipcMain.handle('export-roadmap', (_event, roadmapId) => exportRoadmap(roadmapId));
   ipcMain.handle('import-roadmap', (_event, filePath) => importRoadmap(filePath));
+  ipcMain.handle('import-roadmap-data', (_event, data) => importRoadmapData(data));
 
   createWindow();
 });

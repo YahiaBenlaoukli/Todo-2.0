@@ -43,7 +43,8 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
   updateEdge: (id: number, type: number) => ipcRenderer.invoke("update-edge-type", id, type),
   exportRoadmap: (roadmapId: number) => ipcRenderer.invoke("export-roadmap", roadmapId),
   importRoadmap: (filePath: string) => ipcRenderer.invoke("import-roadmap", filePath),
-
+  importRoadmapData: (data: any) => ipcRenderer.invoke("import-roadmap-data", data),
+  generateRoadmap: (topic: string, difficulty: string, focus: string) => ipcRenderer.invoke("generate-roadmap", topic, difficulty, focus),
   // Explorer
   getFiles: () => ipcRenderer.invoke("get-files"),
   getFileContent: (filePath: string) => ipcRenderer.invoke("get-file-content", filePath),

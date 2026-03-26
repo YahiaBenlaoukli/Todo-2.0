@@ -1,0 +1,403 @@
+{
+  "roadmap": {
+    "id": 6,
+    "name": "Machine Learning",
+    "created_at": "2026-03-26T20:11:55.381Z"
+  },
+  "nodes": [
+    {
+      "id": 30,
+      "type_id": 4,
+      "title": "Start Here",
+      "content": "Begin your Machine Learning journey!",
+      "status": null,
+      "url": null,
+      "position_x": 300,
+      "position_y": 100,
+      "created_at": "2026-03-26T20:11:55.381Z",
+      "updated_at": "2026-03-26 20:13:08",
+      "roadmap_id": 6,
+      "due_date": null
+    },
+    {
+      "id": 31,
+      "type_id": 1,
+      "title": "What is Machine Learning?",
+      "content": "Understand the core concept of ML and its applications.",
+      "status": null,
+      "url": null,
+      "position_x": 300,
+      "position_y": 250,
+      "created_at": "2026-03-26T20:11:55.381Z",
+      "updated_at": "2026-03-26 20:13:08",
+      "roadmap_id": 6,
+      "due_date": null
+    },
+    {
+      "id": 32,
+      "type_id": 1,
+      "title": "Types of ML (Supervised, Unsupervised)",
+      "content": "Differentiate between common learning paradigms.",
+      "status": null,
+      "url": null,
+      "position_x": 300,
+      "position_y": 400,
+      "created_at": "2026-03-26T20:11:55.381Z",
+      "updated_at": "2026-03-26 20:13:08",
+      "roadmap_id": 6,
+      "due_date": null
+    },
+    {
+      "id": 33,
+      "type_id": 1,
+      "title": "Basic Data Preprocessing",
+      "content": "Learn about data cleaning, normalization, and feature scaling.",
+      "status": null,
+      "url": null,
+      "position_x": 200,
+      "position_y": 550,
+      "created_at": "2026-03-26T20:11:55.381Z",
+      "updated_at": "2026-03-26 20:13:08",
+      "roadmap_id": 6,
+      "due_date": null
+    },
+    {
+      "id": 34,
+      "type_id": 2,
+      "title": "Important Note: Math Prerequisites",
+      "content": "Familiarity with Linear Algebra, Calculus, and Probability/Statistics is crucial for deep understanding.",
+      "status": null,
+      "url": null,
+      "position_x": 666,
+      "position_y": 518,
+      "created_at": "2026-03-26T20:11:55.381Z",
+      "updated_at": "2026-03-26T20:14:36.163Z",
+      "roadmap_id": 6,
+      "due_date": null
+    },
+    {
+      "id": 35,
+      "type_id": 1,
+      "title": "Introduction to Neural Networks",
+      "content": "Dive into the fundamental concepts of artificial neurons and their structure.",
+      "status": null,
+      "url": null,
+      "position_x": 300,
+      "position_y": 700,
+      "created_at": "2026-03-26T20:11:55.381Z",
+      "updated_at": "2026-03-26 20:13:08",
+      "roadmap_id": 6,
+      "due_date": null
+    },
+    {
+      "id": 36,
+      "type_id": 1,
+      "title": "Perceptrons & Activation Functions",
+      "content": "Explore the building blocks of NNs and various activation functions.",
+      "status": null,
+      "url": null,
+      "position_x": 298,
+      "position_y": 834,
+      "created_at": "2026-03-26T20:11:55.381Z",
+      "updated_at": "2026-03-26T20:16:00.945Z",
+      "roadmap_id": 6,
+      "due_date": null
+    },
+    {
+      "id": 37,
+      "type_id": 1,
+      "title": "Feedforward Networks & Backpropagation (Concept)",
+      "content": "Understand how information flows and how networks learn via error propagation.",
+      "status": null,
+      "url": null,
+      "position_x": 299.3757058087488,
+      "position_y": 999.8696676530236,
+      "created_at": "2026-03-26T20:11:55.381Z",
+      "updated_at": "2026-03-26T20:16:00.945Z",
+      "roadmap_id": 6,
+      "due_date": null
+    },
+    {
+      "id": 38,
+      "type_id": 2,
+      "title": "Warning: Backpropagation is Key",
+      "content": "While conceptually understood here, fully grasping the math of backpropagation is crucial for advanced debugging and design.",
+      "status": null,
+      "url": null,
+      "position_x": 668,
+      "position_y": 1014,
+      "created_at": "2026-03-26T20:11:55.381Z",
+      "updated_at": "2026-03-26T20:14:36.164Z",
+      "roadmap_id": 6,
+      "due_date": null
+    },
+    {
+      "id": 39,
+      "type_id": 3,
+      "title": "Resource: Deep Learning Book (Ch. 1-6)",
+      "content": "Excellent foundational reading for neural networks.",
+      "status": null,
+      "url": null,
+      "position_x": 300,
+      "position_y": 1150,
+      "created_at": "2026-03-26T20:11:55.381Z",
+      "updated_at": "2026-03-26 20:13:08",
+      "roadmap_id": 6,
+      "due_date": null
+    },
+    {
+      "id": 40,
+      "type_id": 1,
+      "title": "Deep Learning Frameworks (TensorFlow/Keras, PyTorch)",
+      "content": "Get introduced to popular tools for building and training NNs.",
+      "status": null,
+      "url": null,
+      "position_x": 300,
+      "position_y": 1300,
+      "created_at": "2026-03-26T20:11:55.381Z",
+      "updated_at": "2026-03-26 20:13:08",
+      "roadmap_id": 6,
+      "due_date": null
+    },
+    {
+      "id": 41,
+      "type_id": 4,
+      "title": "Checkpoint: Build Your First NN!",
+      "content": "Implement a simple feedforward neural network for a classification task (e.g., MNIST).",
+      "status": null,
+      "url": null,
+      "position_x": 200,
+      "position_y": 1450,
+      "created_at": "2026-03-26T20:11:55.381Z",
+      "updated_at": "2026-03-26 20:13:08",
+      "roadmap_id": 6,
+      "due_date": null
+    },
+    {
+      "id": 42,
+      "type_id": 3,
+      "title": "Resource: Keras Documentation",
+      "content": "Official documentation for Keras, a user-friendly Deep Learning API.",
+      "status": null,
+      "url": null,
+      "position_x": 450,
+      "position_y": 1450,
+      "created_at": "2026-03-26T20:11:55.381Z",
+      "updated_at": "2026-03-26 20:13:08",
+      "roadmap_id": 6,
+      "due_date": null
+    },
+    {
+      "id": 43,
+      "type_id": 4,
+      "title": "End of Beginner NN Journey",
+      "content": "You've built a foundational understanding of Neural Networks! Next, explore CNNs, RNNs, and advanced topics.",
+      "status": null,
+      "url": null,
+      "position_x": 300,
+      "position_y": 1600,
+      "created_at": "2026-03-26T20:11:55.381Z",
+      "updated_at": "2026-03-26 20:13:08",
+      "roadmap_id": 6,
+      "due_date": null
+    },
+    {
+      "id": 44,
+      "type_id": 3,
+      "title": "bruh",
+      "content": "bruh",
+      "status": null,
+      "url": "https://www.deeplearningbook.org/",
+      "position_x": 19.79237471549527,
+      "position_y": 892.8846657437414,
+      "created_at": "2026-03-26T20:15:56.537Z",
+      "updated_at": "2026-03-26T20:16:00.946Z",
+      "roadmap_id": 6,
+      "due_date": null
+    }
+  ],
+  "edges": [
+    {
+      "id": 20,
+      "source": 30,
+      "target": 31,
+      "type_id": 3,
+      "created_at": "2026-03-26T20:11:55.381Z"
+    },
+    {
+      "id": 21,
+      "source": 31,
+      "target": 32,
+      "type_id": 3,
+      "created_at": "2026-03-26T20:11:55.381Z"
+    },
+    {
+      "id": 20,
+      "source": 30,
+      "target": 31,
+      "type_id": 3,
+      "created_at": "2026-03-26T20:11:55.381Z"
+    },
+    {
+      "id": 22,
+      "source": 32,
+      "target": 33,
+      "type_id": 3,
+      "created_at": "2026-03-26T20:11:55.381Z"
+    },
+    {
+      "id": 23,
+      "source": 32,
+      "target": 34,
+      "type_id": 3,
+      "created_at": "2026-03-26T20:11:55.381Z"
+    },
+    {
+      "id": 21,
+      "source": 31,
+      "target": 32,
+      "type_id": 3,
+      "created_at": "2026-03-26T20:11:55.381Z"
+    },
+    {
+      "id": 24,
+      "source": 33,
+      "target": 35,
+      "type_id": 3,
+      "created_at": "2026-03-26T20:11:55.381Z"
+    },
+    {
+      "id": 22,
+      "source": 32,
+      "target": 33,
+      "type_id": 3,
+      "created_at": "2026-03-26T20:11:55.381Z"
+    },
+    {
+      "id": 25,
+      "source": 34,
+      "target": 35,
+      "type_id": 3,
+      "created_at": "2026-03-26T20:11:55.381Z"
+    },
+    {
+      "id": 23,
+      "source": 32,
+      "target": 34,
+      "type_id": 3,
+      "created_at": "2026-03-26T20:11:55.381Z"
+    },
+    {
+      "id": 24,
+      "source": 33,
+      "target": 35,
+      "type_id": 3,
+      "created_at": "2026-03-26T20:11:55.381Z"
+    },
+    {
+      "id": 25,
+      "source": 34,
+      "target": 35,
+      "type_id": 3,
+      "created_at": "2026-03-26T20:11:55.381Z"
+    },
+    {
+      "id": 27,
+      "source": 36,
+      "target": 37,
+      "type_id": 3,
+      "created_at": "2026-03-26T20:11:55.381Z"
+    },
+    {
+      "id": 28,
+      "source": 37,
+      "target": 38,
+      "type_id": 3,
+      "created_at": "2026-03-26T20:11:55.381Z"
+    },
+    {
+      "id": 29,
+      "source": 37,
+      "target": 39,
+      "type_id": 3,
+      "created_at": "2026-03-26T20:11:55.381Z"
+    },
+    {
+      "id": 27,
+      "source": 36,
+      "target": 37,
+      "type_id": 3,
+      "created_at": "2026-03-26T20:11:55.381Z"
+    },
+    {
+      "id": 28,
+      "source": 37,
+      "target": 38,
+      "type_id": 3,
+      "created_at": "2026-03-26T20:11:55.381Z"
+    },
+    {
+      "id": 30,
+      "source": 39,
+      "target": 40,
+      "type_id": 3,
+      "created_at": "2026-03-26T20:11:55.381Z"
+    },
+    {
+      "id": 29,
+      "source": 37,
+      "target": 39,
+      "type_id": 3,
+      "created_at": "2026-03-26T20:11:55.381Z"
+    },
+    {
+      "id": 31,
+      "source": 40,
+      "target": 41,
+      "type_id": 3,
+      "created_at": "2026-03-26T20:11:55.381Z"
+    },
+    {
+      "id": 32,
+      "source": 40,
+      "target": 42,
+      "type_id": 3,
+      "created_at": "2026-03-26T20:11:55.381Z"
+    },
+    {
+      "id": 30,
+      "source": 39,
+      "target": 40,
+      "type_id": 3,
+      "created_at": "2026-03-26T20:11:55.381Z"
+    },
+    {
+      "id": 33,
+      "source": 41,
+      "target": 43,
+      "type_id": 3,
+      "created_at": "2026-03-26T20:11:55.381Z"
+    },
+    {
+      "id": 31,
+      "source": 40,
+      "target": 41,
+      "type_id": 3,
+      "created_at": "2026-03-26T20:11:55.381Z"
+    },
+    {
+      "id": 32,
+      "source": 40,
+      "target": 42,
+      "type_id": 3,
+      "created_at": "2026-03-26T20:11:55.381Z"
+    },
+    {
+      "id": 33,
+      "source": 41,
+      "target": 43,
+      "type_id": 3,
+      "created_at": "2026-03-26T20:11:55.381Z"
+    }
+  ]
+}

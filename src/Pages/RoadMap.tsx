@@ -9,6 +9,8 @@ import MilestoneNode from '../components/FlowNodes/MilestoneNode';
 import { NODE_TYPES, type NodeType, EDGE_TYPES, type EdgeType } from '../../electron/services/types';
 import type { Roadmap } from '../../electron/services/types';
 import { FiPlus, FiTrash2, FiArrowLeft, FiMap, FiEdit2, FiDownload, FiUpload } from 'react-icons/fi';
+import { RiGeminiLine } from "react-icons/ri";
+
 
 
 function RoadMap() {
@@ -30,6 +32,12 @@ function RoadMap() {
 
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [newRoadmapName, setNewRoadmapName] = useState('');
+
+    const [showAIGenerateModal, setShowAIGenerateModal] = useState(false);
+    const [aiTopic, setAiTopic] = useState('');
+    const [aiDifficulty, setAiDifficulty] = useState('beginner');
+    const [aiFocus, setAiFocus] = useState('');
+    const [isGenerating, setIsGenerating] = useState(false);
 
     const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
 
@@ -112,6 +120,36 @@ function RoadMap() {
         setNewRoadmapName('');
         setShowCreateModal(false);
     }
+
+    const handleAIGenerateSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!aiTopic.trim()) return;
+        setIsGenerating(true);
+        try {
+            const response: any = await window.ipcRenderer.invoke('generate-roadmap', aiTopic, aiDifficulty, aiFocus);
+            if (response.status === 'success') {
+                const importRes: any = await window.ipcRenderer.invoke('import-roadmap', response.data);
+                if (importRes.status === 'success') {
+                    console.log('Roadmap generated and imported successfully');
+                    fetchRoadmaps();
+                    setShowAIGenerateModal(false);
+                    setAiTopic('');
+                    setAiFocus('');
+                } else {
+                    console.error('Failed to import generated roadmap:', importRes.message);
+                    alert('Failed to import generated roadmap: ' + importRes.message);
+                }
+            } else {
+                console.error('Failed to generate roadmap:', response.data);
+                alert('Generation failed. ' + JSON.stringify(response.data));
+            }
+        } catch (error) {
+            console.error('Error in AI generation:', error);
+            alert('An error occurred during generation.');
+        } finally {
+            setIsGenerating(false);
+        }
+    };
 
     const handleBackToLanding = async () => {
         await saveAllNodePositions();
@@ -602,12 +640,19 @@ function RoadMap() {
                                 <p className="text-accent">Plan your learning journeys and projects</p>
                             </div>
                             <div className="flex gap-3">
-                                <input 
-                                    type="file" 
-                                    ref={fileInputRef} 
-                                    className="hidden" 
-                                    accept=".json" 
-                                    onChange={handleImportRoadmap} 
+                                <button
+                                    onClick={() => setShowAIGenerateModal(true)}
+                                    className="flex items-center gap-2 bg-primary/10 hover:bg-primary/20 text-primary border border-primary/30 px-5 py-3 rounded-lg shadow-sm transition-all duration-200 transform hover:-translate-y-0.5"
+                                >
+                                    <RiGeminiLine className="text-xl" />
+                                    <span className="font-medium">AI Generate</span>
+                                </button>
+                                <input
+                                    type="file"
+                                    ref={fileInputRef}
+                                    className="hidden"
+                                    accept=".json"
+                                    onChange={handleImportRoadmap}
                                 />
                                 <button
                                     onClick={() => fileInputRef.current?.click()}
@@ -693,6 +738,93 @@ function RoadMap() {
                         )}
                     </div>
                 </div>
+
+                {showAIGenerateModal && (
+                    <div className="fixed inset-0 z-50 flex justify-end bg-black/50 backdrop-blur-sm transition-opacity duration-300">
+                        <div className="absolute inset-0" onClick={() => !isGenerating && setShowAIGenerateModal(false)}></div>
+
+                        <div className="bg-sidebar border-l border-border shadow-2xl w-96 max-w-full h-full p-6 flex flex-col transform transition-transform duration-300 relative z-10 overflow-y-auto translate-x-0">
+                            <div className="flex items-center gap-3 mb-8">
+                                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                                    <RiGeminiLine className="text-xl" />
+                                </div>
+                                <h2 className="text-2xl font-bold text-text">Generate Roadmap</h2>
+                            </div>
+
+                            <form onSubmit={handleAIGenerateSubmit} className="flex flex-col flex-1">
+                                <div className="space-y-5 flex-1">
+                                    <div>
+                                        <label className='block text-sm font-medium text-text mb-1'>Topic / Subject</label>
+                                        <input
+                                            type="text"
+                                            value={aiTopic}
+                                            onChange={(e) => setAiTopic(e.target.value)}
+                                            className="w-full px-4 py-3 border border-border bg-bg text-text mt-1 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all "
+                                            placeholder="e.g. Next.js, Machine Learning..."
+                                            autoFocus
+                                            disabled={isGenerating}
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className='block text-sm font-medium text-text mb-1'>Difficulty</label>
+                                        <select
+                                            value={aiDifficulty}
+                                            onChange={(e) => setAiDifficulty(e.target.value)}
+                                            className="w-full px-4 py-3 border border-border bg-bg text-text mt-1 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all "
+                                            disabled={isGenerating}
+                                        >
+                                            <option value="beginner">Beginner</option>
+                                            <option value="intermediate">Intermediate</option>
+                                            <option value="advanced">Advanced</option>
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label className='block text-sm font-medium text-text mb-1'>Specific Focus (Optional)</label>
+                                        <input
+                                            type="text"
+                                            value={aiFocus}
+                                            onChange={(e) => setAiFocus(e.target.value)}
+                                            className="w-full px-4 py-3 border border-border bg-bg text-text mt-1 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all "
+                                            placeholder="e.g. State Management..."
+                                            disabled={isGenerating}
+                                        />
+                                    </div>
+
+                                    <div className="text-sm text-text/60 bg-primary/5 p-4 rounded-lg border border-primary/20 mt-6">
+                                        The AI will automatically structure your roadmap layout and connect your learning nodes based on the best path forward.
+                                    </div>
+                                </div>
+
+                                <div className="mt-8 pt-6 flex justify-end gap-3 border-t border-border/50">
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowAIGenerateModal(false)}
+                                        disabled={isGenerating}
+                                        className="px-4 py-2 text-text bg-transparent border border-border hover:bg-bg rounded-lg transition-colors font-medium disabled:opacity-50"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        disabled={isGenerating || !aiTopic.trim()}
+                                        className="flex items-center justify-center min-w-[130px] gap-2 px-6 py-2 bg-primary hover:bg-primary/90 text-white rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 font-medium disabled:opacity-50 disabled:transform-none"
+                                    >
+                                        {isGenerating ? (
+                                            <>
+                                                <div className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin"></div>
+                                                Generating
+                                            </>
+                                        ) : (
+                                            <>Generate</>
+                                        )}
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                )}
 
                 {showCreateModal && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm transition-all duration-300">
@@ -939,7 +1071,7 @@ function RoadMap() {
                         <FiMap className="text-primary" />
                         <span className="font-bold text-secondary text-sm mr-2">{selectedRoadmap.name}</span>
                         <div className="h-4 w-px bg-gray-300 mx-1"></div>
-                        <button 
+                        <button
                             onClick={handleExportRoadmap}
                             className="flex items-center gap-1.5 text-xs font-medium text-text/60 hover:text-primary transition-colors"
                             title="Export Roadmap"

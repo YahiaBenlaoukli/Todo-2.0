@@ -1,0 +1,91 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Generated schema for Root",
+    "type": "object",
+    "properties": {
+        "roadmap": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "name",
+                "created_at"
+            ]
+        },
+        "nodes": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "number"
+                    },
+                    "type_id": {
+                        "type": "number"
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "content": {
+                        "type": "string"
+                    },
+                    "position_x": {
+                        "type": "number"
+                    },
+                    "position_y": {
+                        "type": "number"
+                    },
+                    "created_at": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "id",
+                    "type_id",
+                    "title",
+                    "content",
+                    "position_x",
+                    "position_y",
+                    "created_at"
+                ]
+            }
+        },
+        "edges": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "source": {
+                        "type": "number"
+                    },
+                    "target": {
+                        "type": "number"
+                    },
+                    "type_id": {
+                        "type": "number"
+                    },
+                    "created_at": {
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "source",
+                    "target",
+                    "type_id",
+                    "created_at"
+                ]
+            }
+        }
+    },
+    "required": [
+        "roadmap",
+        "nodes",
+        "edges"
+    ]
+}

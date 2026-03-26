@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@google/genai": "^1.46.0",
     "@milkdown/core": "^7.19.2",
     "@milkdown/crepe": "^7.19.2",
     "@milkdown/ctx": "^7.19.2",
@@ -22,9 +23,12 @@
     "@milkdown/utils": "^7.19.2",
     "@tailwindcss/postcss": "^4.1.18",
     "@xyflow/react": "^12.10.0",
+    "ajv": "^6.14.0",
     "autoprefixer": "^10.4.24",
     "better-sqlite3": "^12.6.2",
+    "bufferutil": "^4.1.0",
     "codemirror": "^6.0.2",
+    "dotenv": "^17.3.1",
     "postcss": "^8.5.6",
     "postcss-cli": "^11.0.1",
     "react": "^18.2.0",
@@ -34,7 +38,8 @@
     "react-router-dom": "^7.13.0",
     "react-syntax-highlighter": "^16.1.1",
     "remark-gfm": "^4.0.1",
-    "tailwindcss": "^4.1.18"
+    "tailwindcss": "^4.1.18",
+    "utf-8-validate": "^6.0.6"
   },
   "devDependencies": {
     "@types/react": "^18.2.64",

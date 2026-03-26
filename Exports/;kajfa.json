@@ -1,38 +1,53 @@
 {
   "roadmap": {
-    "id": 1,
+    "id": 4,
     "name": ";kajfa",
     "created_at": "2026-02-20T14:53:45.018Z"
   },
   "nodes": [
     {
-      "id": 11,
+      "id": 15,
       "type_id": 1,
       "title": "d",
       "content": "afa",
-      "status": "pending",
+      "status": null,
       "url": null,
       "position_x": 256,
       "position_y": 164,
       "created_at": "2026-03-02T12:30:42.126Z",
-      "updated_at": "2026-03-02 12:30:42",
-      "roadmap_id": 1,
+      "updated_at": "2026-03-25 14:05:47",
+      "roadmap_id": 4,
       "due_date": null
     },
     {
-      "id": 12,
+      "id": 16,
       "type_id": 1,
       "title": "fda",
       "content": "fadfdaf",
-      "status": "pending",
+      "status": null,
       "url": null,
       "position_x": 265.70183017454,
       "position_y": 439.55844035062626,
       "created_at": "2026-03-02T12:38:54.217Z",
-      "updated_at": "2026-03-02 12:38:54",
-      "roadmap_id": 1,
+      "updated_at": "2026-03-25 14:05:47",
+      "roadmap_id": 4,
       "due_date": null
     }
   ],
-  "edges": []
+  "edges": [
+    {
+      "id": 5,
+      "source": 15,
+      "target": 16,
+      "type_id": 1,
+      "created_at": "2026-03-26T18:53:46.571Z"
+    },
+    {
+      "id": 5,
+      "source": 15,
+      "target": 16,
+      "type_id": 1,
+      "created_at": "2026-03-26T18:53:46.571Z"
+    }
+  ]
 }

@@ -3,6 +3,8 @@ import Database from 'better-sqlite3'
 const db = new Database('todo2.0.db', { verbose: console.log })
 db.pragma('journal_mode = WAL');
 import { type NodeType } from '../../electron/services/types';
+import { promises as fs } from 'fs';
+import path from 'path';
 
 
 
@@ -66,6 +68,8 @@ CREATE INDEX idx_edges_target ON edges(target);
 `;
 
 db.exec(quertyCreateTable);*/
+
+const EXPORTS_PATH = path.join(process.cwd(), "Exports");
 
 
 export async function getRoadmaps() {
@@ -228,6 +232,71 @@ export async function updateEdge(id: number, type: number): Promise<Record<strin
         const stmt = db.prepare('UPDATE edges SET type_id = ? WHERE id = ?');
         stmt.run(type, id);
         return { status: 'success', message: 'Edge updated successfully' };
+    } catch (error) {
+        return { status: "an error occurred", message: (error as Error).message };
+    }
+}
+
+export async function exportRoadmap(roadmapId: number) {
+    try {
+        const roadmap = db.prepare('SELECT * FROM roadmaps WHERE id = ?').get(roadmapId);
+        const stmt = db.prepare('SELECT * FROM nodes WHERE roadmap_id = ?');
+        const nodes = stmt.all(roadmapId);
+        const stmt2 = db.prepare(`SELECT e.id, e.source, e.target, e.type_id, e.created_at
+        FROM edges e
+        JOIN nodes n ON (e.source = n.id OR e.target = n.id)
+        WHERE n.roadmap_id = ?`);
+        const edges = stmt2.all(roadmapId);
+
+        const filename = `${roadmap.name}.json`;
+        const filePath = path.join(EXPORTS_PATH, filename);
+
+        await fs.mkdir(EXPORTS_PATH, { recursive: true });
+        await fs.writeFile(filePath, JSON.stringify({ roadmap, nodes, edges }, null, 2), 'utf-8');
+        return { status: 'success', message: 'Roadmap exported successfully' };
+    } catch (error) {
+        return { status: "an error occurred", message: (error as Error).message };
+    }
+}
+
+export async function importRoadmap(filePath: string) {
+    try {
+        const roadmap = await fs.readFile(filePath, 'utf-8');
+        const roadmapData = JSON.parse(roadmap);
+        const stmt = db.prepare('INSERT INTO roadmaps (name, created_at) VALUES (?, ?)');
+        const roadmapResult = stmt.run(
+            roadmapData.roadmap.name,
+            roadmapData.roadmap.created_at
+        );
+
+        const newRoadmapId = roadmapResult.lastInsertRowid;
+
+        const nodeIdMap = new Map();
+        const stmt2 = db.prepare('INSERT INTO nodes (roadmap_id, title, content, type_id, position_x, position_y, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)');
+        for (const node of roadmapData.nodes) {
+            const result = stmt2.run(
+                newRoadmapId,
+                node.title,
+                node.content,
+                node.type_id,
+                node.position_x,
+                node.position_y,
+                node.created_at
+            );
+
+            nodeIdMap.set(node.id, result.lastInsertRowid);
+        }
+
+        const stmt3 = db.prepare('INSERT INTO edges (source, target, type_id, created_at) VALUES (?, ?, ?, ?)');
+        for (const edge of roadmapData.edges) {
+            stmt3.run(
+                nodeIdMap.get(edge.source),
+                nodeIdMap.get(edge.target),
+                edge.type_id,
+                edge.created_at
+            );
+        }
+        return { status: 'success', message: 'Roadmap imported successfully' };
     } catch (error) {
         return { status: "an error occurred", message: (error as Error).message };
     }

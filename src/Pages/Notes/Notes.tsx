@@ -79,16 +79,16 @@ function Notes() {
     }, [activeFile, content, isDirty]);
 
     return (
-        <div className="flex h-screen overflow-hidden">
+        <div className="flex h-screen overflow-hidden bg-bg">
             <Navbar />
 
             {/* Sidebar */}
-            <div className="hidden md:block ml-14 w-60 h-screen shrink-0 border-r border-white/10">
+            <div className="hidden md:block ml-0 md:ml-14 w-60 h-screen shrink-0 border-r border-border bg-sidebar">
                 <FileExplorer onFileSelect={handleFileSelect} />
             </div>
 
             {/* Editor area */}
-            <div className="flex-1 relative bg-white dark:bg-[#1e1e1e]">
+            <div className="flex-1 relative bg-bg transition-colors duration-200">
                 {activeFile ? (
                     loading ? (
                         <div className="flex items-center justify-center h-full">
@@ -97,15 +97,15 @@ function Notes() {
                     ) : (
                         <div className="h-full relative flex flex-col">
                             {/* Editor Header / Action Bar */}
-                            <div className="flex items-center justify-end px-6 py-3 border-b border-[#e5e5e5] dark:border-[#333333]">
+                            <div className="flex items-center justify-end px-6 py-3 border-b border-border bg-bg/50 backdrop-blur-sm z-10 transition-colors">
                                 <button
                                     onClick={() => setViewMode(prev => prev === 'editor' ? 'source' : 'editor')}
-                                    className="px-3 py-1 text-sm bg-gray-100 dark:bg-[#252525] hover:bg-gray-200 dark:hover:bg-[#333333] text-gray-700 dark:text-gray-300 rounded transition-colors"
+                                    className="px-3 py-1 text-sm border border-border bg-sidebar hover:bg-bg/80 text-text rounded transition-colors"
                                 >
                                     {viewMode === 'editor' ? 'View Source' : 'View Editor'}
                                 </button>
                             </div>
-                            
+
                             {/* Editor Body */}
                             <div className="flex-1 overflow-hidden relative">
                                 {viewMode === 'editor' ? (
@@ -115,7 +115,7 @@ function Notes() {
                                     />
                                 ) : (
                                     <textarea
-                                        className="w-full h-full p-8 bg-transparent text-gray-800 dark:text-gray-200 font-mono text-sm resize-none focus:outline-none"
+                                        className="w-full h-full p-8 bg-transparent text-text font-mono text-sm resize-none focus:outline-none placeholder:text-text/40"
                                         value={content}
                                         onChange={(e) => handleEditorChange(e.target.value)}
                                         placeholder="Type markdown here..."
@@ -123,15 +123,20 @@ function Notes() {
                                 )}
                             </div>
                             {saving ? (
-                                <div className="absolute top-0 left-0 right-0 bottom-0 flex items-center justify-center">Saving...</div>
+                                <div className="absolute top-0 left-0 right-0 bottom-0 flex items-center justify-center pointer-events-none font-medium text-text bg-bg/50 backdrop-blur-sm z-50">Saving...</div>
                             ) : error ? (
-                                <div className='absolute bottom-2 left-2 text-[12px] text-red-500'>{error}</div>
+                                <div className='absolute bottom-2 left-2 text-[12px] text-red-500 bg-red-500/10 px-2 py-1 rounded'>{error}</div>
                             ) : null}
                         </div>
                     )
                 ) : (
                     <div className="flex items-center justify-center h-full">
-                        <div className="text-primary text-2xl font-bold">No file selected</div>
+                        <div className="text-text/50 text-2xl font-bold flex flex-col items-center gap-4 ">
+                            <div className="w-16 h-16 rounded-2xl bg-sidebar flex items-center justify-center border border-border shadow-sm">
+                                <span className="text-4xl">📝</span>
+                            </div>
+                            No file selected
+                        </div>
                     </div>
                 )
                 }

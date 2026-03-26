@@ -75,7 +75,7 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-bg">
       <Navbar />
 
       <div className="ml-0 md:ml-14 min-h-screen pb-16 md:pb-0">
@@ -95,12 +95,12 @@ function App() {
           </div>
 
           {todos.length === 0 ? (
-            <div className="text-center py-20 bg-white rounded-2xl shadow-sm border border-gray-100">
-              <div className="text-gray-300 mb-4 flex justify-center">
+            <div className="text-center py-20 bg-sidebar rounded-2xl shadow-sm border border-border">
+              <div className="text-text/30 mb-4 flex justify-center">
                 <FiEdit2 className="text-6xl" />
               </div>
-              <h3 className="text-xl font-medium text-gray-900">No tasks yet</h3>
-              <p className="text-gray-500 mt-2">Get started by creating a new task above.</p>
+              <h3 className="text-xl font-medium text-text">No tasks yet</h3>
+              <p className="text-text/70 mt-2">Get started by creating a new task above.</p>
             </div>
           ) : (
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">

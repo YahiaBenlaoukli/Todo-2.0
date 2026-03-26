@@ -25,6 +25,7 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
   addTodo: (taskName: string, taskDes: string) => ipcRenderer.invoke("add-todo", taskName, taskDes),
   deleteTodo: (id: number) => ipcRenderer.invoke("delete-todo", id),
   updateTodo: (id: number, taskName: string, taskDes: string) => ipcRenderer.invoke("update-todo", id, taskName, taskDes),
+  //roadmaps
   getRoadmaps: () => ipcRenderer.invoke("get-roadmaps"),
   addRoadmap: (name: string) => ipcRenderer.invoke("add-roadmap", name),
   deleteRoadmap: (id: number) => ipcRenderer.invoke("delete-roadmap", id),
@@ -40,6 +41,8 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
   addEdge: (sourceId: number, targetId: number, type: number) => ipcRenderer.invoke("add-edge", sourceId, targetId, type),
   deleteEdge: (id: number) => ipcRenderer.invoke("delete-edge", id),
   updateEdge: (id: number, type: number) => ipcRenderer.invoke("update-edge-type", id, type),
+  exportRoadmap: (roadmapId: number) => ipcRenderer.invoke("export-roadmap", roadmapId),
+  importRoadmap: (filePath: string) => ipcRenderer.invoke("import-roadmap", filePath),
 
   // Explorer
   getFiles: () => ipcRenderer.invoke("get-files"),

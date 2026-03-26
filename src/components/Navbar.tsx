@@ -33,7 +33,7 @@ const Navbar: React.FC = () => {
 
                 {/* Bottom nav */}
                 <div className="flex flex-col items-center gap-1 mb-2">
-                    <button 
+                    <button
                         onClick={toggleTheme}
                         data-tooltip={theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
                         className="relative w-12 h-11 flex items-center justify-center rounded transition-colors duration-150 group text-text hover:text-white cursor-pointer"

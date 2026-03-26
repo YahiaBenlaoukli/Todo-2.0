@@ -16,3 +16,16 @@ Arp (Adrress resolution protocol)
 finds the mac address of the device using the **ip adrress**
 \*vulnerable to ARP spoofing -> attacker pretends to be another device (MITM attack)
 ====================================================================================
+
+<br />
+
+## Virtual Private Networks
+
+A VPN changes the ip address of the requests and encrypts the data into data packets
+
+<br />
+
+<br />
+
+<br />
+

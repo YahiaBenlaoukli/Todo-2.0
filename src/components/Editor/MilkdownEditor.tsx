@@ -39,31 +39,30 @@ const MilkdownEditorContent: FC<MilkdownEditorProps> = ({ value, onChange }) => 
             crepe.destroy();
         };
         // Intentionally only run once on mount
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     // Sync external file changes into the editor
     useEffect(() => {
         if (!crepeRef.current) return;
-        
+
         // This prevents the editor from resetting its cursor when typing
         crepeRef.current.editor.action((ctx) => {
             // Getting the markdown string inside milkdown context
-            return ""; 
+            return "";
         });
-        
+
         // Actually, Crepe exposes 'setMarkdown' directly in some versions, but not others.
         // We use @milkdown/utils replaceAll to safely swap the document.
         if (value && value !== "" && rootRef.current?.innerText.trim() === "") {
-             import('@milkdown/utils').then(({ replaceAll }) => {
-                 crepeRef.current?.editor.action(replaceAll(value));
-             }).catch(console.error);
+            import('@milkdown/utils').then(({ replaceAll }) => {
+                crepeRef.current?.editor.action(replaceAll(value));
+            }).catch(console.error);
         }
     }, [value]);
 
     return (
         <div className="milkdown-container h-full w-full overflow-y-auto bg-transparent prose dark:prose-invert max-w-none">
-            <div className="max-w-[800px] mx-auto px-8 py-16 pb-32">
+            <div className="max-w-full ">
                 <div ref={rootRef} className="crepe-root h-full w-full" />
             </div>
         </div>

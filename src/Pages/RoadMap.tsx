@@ -8,9 +8,7 @@ import NoteNode from '../components/FlowNodes/NoteNode';
 import MilestoneNode from '../components/FlowNodes/MilestoneNode';
 import { NODE_TYPES, type NodeType, EDGE_TYPES, type EdgeType } from '../../electron/services/types';
 import type { Roadmap } from '../../electron/services/types';
-import { FiPlus, FiTrash2, FiArrowLeft, FiMap, FiEdit2 } from 'react-icons/fi';
-
-import { ipcRenderer } from 'electron';
+import { FiPlus, FiTrash2, FiArrowLeft, FiMap, FiEdit2, FiDownload, FiUpload } from 'react-icons/fi';
 
 
 function RoadMap() {
@@ -46,6 +44,35 @@ function RoadMap() {
         EDGE_TYPES.SMOOTHSTEP,
         EDGE_TYPES.BEZIER
     ];
+
+    //imports and exports
+    const handleExportRoadmap = async () => {
+        const response: any = await window.ipcRenderer.invoke('export-roadmap', selectedRoadmap?.id);
+        if (response.status === 'success') {
+            console.log('Roadmap exported successfully');
+            alert('Roadmap exported successfully!');
+        } else {
+            console.error('Failed to export roadmap:', response.message);
+            alert('Failed to export: ' + response.message);
+        }
+    }
+
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const handleImportRoadmap = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+        const filePath = (file as any).path;
+        const response: any = await window.ipcRenderer.invoke('import-roadmap', filePath);
+        if (response.status === 'success') {
+            console.log('Roadmap imported successfully');
+            fetchRoadmaps();
+        } else {
+            console.error('Failed to import roadmap:', response.message);
+            alert('Failed to import: ' + response.message);
+        }
+        if (fileInputRef.current) fileInputRef.current.value = '';
+    }
 
     ///built in handlers
     const onConnect = useCallback(
@@ -564,7 +591,7 @@ function RoadMap() {
 
     if (!selectedRoadmap) {
         return (
-            <div className="min-h-screen bg-gray-50">
+            <div className="min-h-screen bg-bg">
                 <Navbar />
 
                 <div className="ml-0 md:ml-14 min-h-screen pb-16 md:pb-0">
@@ -574,22 +601,38 @@ function RoadMap() {
                                 <h1 className="text-4xl font-bold text-secondary mb-2">My Roadmaps</h1>
                                 <p className="text-accent">Plan your learning journeys and projects</p>
                             </div>
-                            <button
-                                onClick={() => setShowCreateModal(true)}
-                                className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-white px-5 py-3 rounded-lg shadow-md transition-all duration-200 transform hover:-translate-y-0.5"
-                            >
-                                <FiPlus className="text-xl" />
-                                <span className="font-medium">New Roadmap</span>
-                            </button>
+                            <div className="flex gap-3">
+                                <input 
+                                    type="file" 
+                                    ref={fileInputRef} 
+                                    className="hidden" 
+                                    accept=".json" 
+                                    onChange={handleImportRoadmap} 
+                                />
+                                <button
+                                    onClick={() => fileInputRef.current?.click()}
+                                    className="flex items-center gap-2 bg-sidebar hover:bg-bg text-secondary border border-border px-5 py-3 rounded-lg shadow-sm transition-all duration-200 transform hover:-translate-y-0.5"
+                                >
+                                    <FiUpload className="text-xl" />
+                                    <span className="font-medium">Import Roadmap</span>
+                                </button>
+                                <button
+                                    onClick={() => setShowCreateModal(true)}
+                                    className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-white px-5 py-3 rounded-lg shadow-md transition-all duration-200 transform hover:-translate-y-0.5"
+                                >
+                                    <FiPlus className="text-xl" />
+                                    <span className="font-medium">New Roadmap</span>
+                                </button>
+                            </div>
                         </div>
 
                         {roadmaps.length === 0 ? (
-                            <div className="text-center py-20 bg-white rounded-2xl shadow-sm border border-gray-100">
-                                <div className="text-gray-300 mb-4 flex justify-center">
+                            <div className="text-center py-20 bg-sidebar rounded-2xl shadow-sm border border-border">
+                                <div className="text-text/30 mb-4 flex justify-center">
                                     <FiMap className="text-6xl" />
                                 </div>
-                                <h3 className="text-xl font-medium text-gray-900">No roadmaps yet</h3>
-                                <p className="text-gray-500 mt-2">Get started by creating your first roadmap above.</p>
+                                <h3 className="text-xl font-medium text-text">No roadmaps yet</h3>
+                                <p className="text-text/70 mt-2">Get started by creating your first roadmap above.</p>
                             </div>
                         ) : (
                             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -608,7 +651,7 @@ function RoadMap() {
                                 {roadmaps.map((roadmap) => (
                                     <div
                                         key={roadmap.id}
-                                        className="group relative flex flex-col justify-between p-6 rounded-2xl bg-white/80 backdrop-blur-sm border border-gray-200/60 shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all duration-300 min-h-[200px] cursor-pointer overflow-hidden"
+                                        className="group relative flex flex-col justify-between p-6 rounded-2xl bg-sidebar/80 backdrop-blur-sm border border-border shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all duration-300 min-h-[200px] cursor-pointer overflow-hidden"
                                         onClick={() => handleSelectRoadmap(roadmap)}
                                     >
                                         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-accent to-primary/60 rounded-t-2xl"></div>
@@ -636,7 +679,7 @@ function RoadMap() {
                                             </h3>
                                         </div>
 
-                                        <div className="flex items-center justify-between mt-auto pt-4 border-t border-gray-100">
+                                        <div className="flex items-center justify-between mt-auto pt-4 border-t border-border/50">
                                             <span className="text-sm text-accent">
                                                 {formatDate(roadmap.created_at)}
                                             </span>
@@ -655,22 +698,22 @@ function RoadMap() {
                     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm transition-all duration-300">
                         <div className="absolute inset-0" onClick={() => { setShowCreateModal(false); setNewRoadmapName(''); }}></div>
 
-                        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-2xl w-96 transform transition-all scale-100 relative z-10 border border-gray-200 dark:border-gray-700">
+                        <div className="bg-sidebar p-6 rounded-xl shadow-2xl w-96 transform transition-all scale-100 relative z-10 border border-border">
                             <div className="flex items-center gap-3 mb-6">
                                 <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
                                     <FiMap className="text-xl text-primary" />
                                 </div>
-                                <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">New Roadmap</h2>
+                                <h2 className="text-2xl font-bold text-text">New Roadmap</h2>
                             </div>
 
                             <form onSubmit={handleCreateSubmit}>
                                 <div className="mb-6">
-                                    <label className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1'>Roadmap Name</label>
+                                    <label className='block text-sm font-medium text-text mb-1'>Roadmap Name</label>
                                     <input
                                         type="text"
                                         value={newRoadmapName}
                                         onChange={(e) => setNewRoadmapName(e.target.value)}
-                                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all dark:bg-gray-700 dark:text-white"
+                                        className="w-full px-4 py-2 border border-border bg-bg text-text mt-1 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all "
                                         placeholder="e.g. Learn React, Backend Roadmap..."
                                         autoFocus
                                     />
@@ -680,7 +723,7 @@ function RoadMap() {
                                     <button
                                         type="button"
                                         onClick={() => { setShowCreateModal(false); setNewRoadmapName(''); }}
-                                        className="px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors font-medium"
+                                        className="px-4 py-2 text-text bg-transparent border border-border hover:bg-bg rounded-lg transition-colors font-medium"
                                     >
                                         Cancel
                                     </button>
@@ -700,22 +743,22 @@ function RoadMap() {
                     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm transition-all duration-300">
                         <div className="absolute inset-0" onClick={() => setDeleteConfirmId(null)}></div>
 
-                        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-2xl w-96 transform transition-all scale-100 relative z-10 border border-gray-200 dark:border-gray-700">
+                        <div className="bg-sidebar p-6 rounded-xl shadow-2xl w-96 transform transition-all scale-100 relative z-10 border border-border">
                             <div className="flex items-center gap-3 mb-4">
-                                <div className="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center">
+                                <div className="w-10 h-10 rounded-lg bg-red-500/10 flex items-center justify-center">
                                     <FiTrash2 className="text-xl text-red-500" />
                                 </div>
-                                <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">Delete Roadmap</h2>
+                                <h2 className="text-xl font-bold text-text">Delete Roadmap</h2>
                             </div>
 
-                            <p className="text-gray-600 dark:text-gray-400 mb-6">
+                            <p className="text-text/70 mb-6">
                                 Are you sure you want to delete this roadmap? This action cannot be undone and all nodes within it will be lost.
                             </p>
 
                             <div className="flex justify-end gap-3">
                                 <button
                                     onClick={() => setDeleteConfirmId(null)}
-                                    className="px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors font-medium"
+                                    className="px-4 py-2 text-text bg-transparent border border-border hover:bg-bg rounded-lg transition-colors font-medium"
                                 >
                                     Cancel
                                 </button>
@@ -739,39 +782,39 @@ function RoadMap() {
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm transition-all duration-300">
                     <div className="absolute inset-0" onClick={closeMenu}></div>
 
-                    <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-2xl w-96 transform transition-all scale-100 relative z-10 border border-gray-200 dark:border-gray-700">
-                        <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-gray-100">Add New Node</h2>
+                    <div className="bg-sidebar p-6 rounded-xl shadow-2xl w-96 transform transition-all scale-100 relative z-10 border border-border">
+                        <h2 className="text-2xl font-bold mb-6 text-text">Add New Node</h2>
 
                         <form onSubmit={handleAddNode}>
                             <div className="mb-4">
-                                <label className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1'>Title</label>
+                                <label className='block text-sm font-medium text-text mb-1'>Title</label>
                                 <input
                                     type="text"
                                     value={nodeTitle}
                                     onChange={(e) => setNodeTitle(e.target.value)}
-                                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all dark:bg-gray-700 dark:text-white"
+                                    className="w-full px-4 py-2 border border-border bg-bg text-text mt-1 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all "
                                     placeholder="e.g. Research Phase"
                                     autoFocus
                                 />
                             </div>
 
                             <div className="mb-4">
-                                <label className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1'>Description</label>
+                                <label className='block text-sm font-medium text-text mb-1'>Description</label>
                                 <textarea
                                     value={nodeDescription}
                                     onChange={(e) => setNodeDescription(e.target.value)}
-                                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all dark:bg-gray-700 dark:text-white resize-none"
+                                    className="w-full px-4 py-2 border border-border bg-bg text-text mt-1 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all  resize-none"
                                     placeholder="Brief description..."
                                     rows={3}
                                 />
                             </div>
 
                             <div className="mb-6">
-                                <label className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1'>Type</label>
+                                <label className='block text-sm font-medium text-text mb-1'>Type</label>
                                 <select
                                     value={nodeType}
                                     onChange={(e) => setNodeType(Number(e.target.value) as NodeType)}
-                                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all dark:bg-gray-700 dark:text-white"
+                                    className="w-full px-4 py-2 border border-border bg-bg text-text mt-1 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all "
                                 >
                                     <option value={NODE_TYPES.TASKNODE}>Task</option>
                                     <option value={NODE_TYPES.NOTENODE}>Note</option>
@@ -782,12 +825,12 @@ function RoadMap() {
 
                             {nodeType === NODE_TYPES.RESOURCENODE && (
                                 <div className="mb-4 animate-fadeIn">
-                                    <label className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1'>Resource URL</label>
+                                    <label className='block text-sm font-medium text-text mb-1'>Resource URL</label>
                                     <input
                                         type="url"
                                         value={nodeUrl}
                                         onChange={(e) => setNodeUrl(e.target.value)}
-                                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all dark:bg-gray-700 dark:text-white"
+                                        className="w-full px-4 py-2 border border-border bg-bg text-text mt-1 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all "
                                         placeholder="https://example.com"
                                     />
                                 </div>
@@ -795,12 +838,12 @@ function RoadMap() {
 
                             {nodeType === NODE_TYPES.MILESTONENODE && (
                                 <div className="mb-4 animate-fadeIn">
-                                    <label className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1'>Due Date</label>
+                                    <label className='block text-sm font-medium text-text mb-1'>Due Date</label>
                                     <input
                                         type="date"
                                         value={nodeDueDate}
                                         onChange={(e) => setNodeDueDate(e.target.value)}
-                                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all dark:bg-gray-700 dark:text-white"
+                                        className="w-full px-4 py-2 border border-border bg-bg text-text mt-1 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all "
                                     />
                                 </div>
                             )}
@@ -809,7 +852,7 @@ function RoadMap() {
                                 <button
                                     type="button"
                                     onClick={closeMenu}
-                                    className="px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors font-medium"
+                                    className="px-4 py-2 text-text bg-transparent border border-border hover:bg-bg rounded-lg transition-colors font-medium"
                                 >
                                     Cancel
                                 </button>
@@ -830,33 +873,33 @@ function RoadMap() {
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm transition-all duration-300">
                     <div className="absolute inset-0" onClick={() => { setIsEditModalOpen(false); setEditingNode(null); }}></div>
 
-                    <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-2xl w-96 transform transition-all scale-100 relative z-10 border border-gray-200 dark:border-gray-700">
+                    <div className="bg-sidebar p-6 rounded-xl shadow-2xl w-96 transform transition-all scale-100 relative z-10 border border-border">
                         <div className="flex items-center gap-3 mb-6">
-                            <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+                            <div className="w-10 h-10 rounded-lg bg-secondary/10 flex items-center justify-center">
                                 <FiEdit2 className="text-xl text-blue-600" />
                             </div>
-                            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Edit Node</h2>
+                            <h2 className="text-2xl font-bold text-text">Edit Node</h2>
                         </div>
 
                         <form onSubmit={handleUpdateNode}>
                             <div className="mb-4">
-                                <label className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1'>Title</label>
+                                <label className='block text-sm font-medium text-text mb-1'>Title</label>
                                 <input
                                     type="text"
                                     value={editTitle}
                                     onChange={(e) => setEditTitle(e.target.value)}
-                                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all dark:bg-gray-700 dark:text-white"
+                                    className="w-full px-4 py-2 border border-border bg-bg text-text mt-1 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all "
                                     placeholder="Node title"
                                     autoFocus
                                 />
                             </div>
 
                             <div className="mb-6">
-                                <label className='block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1'>Description</label>
+                                <label className='block text-sm font-medium text-text mb-1'>Description</label>
                                 <textarea
                                     value={editContent}
                                     onChange={(e) => setEditContent(e.target.value)}
-                                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all dark:bg-gray-700 dark:text-white resize-none"
+                                    className="w-full px-4 py-2 border border-border bg-bg text-text mt-1 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all  resize-none"
                                     placeholder="Brief description..."
                                     rows={3}
                                 />
@@ -866,7 +909,7 @@ function RoadMap() {
                                 <button
                                     type="button"
                                     onClick={() => { setIsEditModalOpen(false); setEditingNode(null); }}
-                                    className="px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors font-medium"
+                                    className="px-4 py-2 text-text bg-transparent border border-border hover:bg-bg rounded-lg transition-colors font-medium"
                                 >
                                     Cancel
                                 </button>
@@ -886,17 +929,24 @@ function RoadMap() {
                 <div className="absolute top-4 left-4 z-40 flex items-center gap-3">
                     <button
                         onClick={handleBackToLanding}
-                        className="flex items-center gap-2 px-4 py-2.5 bg-white/90 backdrop-blur-sm rounded-xl shadow-lg border border-gray-200/60 text-secondary hover:bg-white hover:shadow-xl transition-all duration-200 group"
+                        className="flex items-center gap-2 px-4 py-2.5 bg-sidebar/90 backdrop-blur-sm rounded-xl shadow-lg border border-border text-secondary hover:bg-sidebar hover:shadow-xl transition-all duration-200 group"
                     >
                         <FiArrowLeft className="text-lg group-hover:-translate-x-0.5 transition-transform" />
                         <span className="font-medium text-sm">Back</span>
                     </button>
 
-                    <div className="px-4 py-2.5 bg-white/90 backdrop-blur-sm rounded-xl shadow-lg border border-gray-200/60">
-                        <div className="flex items-center gap-2">
-                            <FiMap className="text-primary" />
-                            <span className="font-bold text-secondary text-sm">{selectedRoadmap.name}</span>
-                        </div>
+                    <div className="px-4 py-2.5 bg-sidebar/90 backdrop-blur-sm rounded-xl shadow-lg border border-border flex items-center gap-2">
+                        <FiMap className="text-primary" />
+                        <span className="font-bold text-secondary text-sm mr-2">{selectedRoadmap.name}</span>
+                        <div className="h-4 w-px bg-gray-300 mx-1"></div>
+                        <button 
+                            onClick={handleExportRoadmap}
+                            className="flex items-center gap-1.5 text-xs font-medium text-text/60 hover:text-primary transition-colors"
+                            title="Export Roadmap"
+                        >
+                            <FiDownload className="text-sm" />
+                            Export
+                        </button>
                     </div>
                 </div>
 

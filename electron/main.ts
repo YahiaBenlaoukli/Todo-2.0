@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url'
 import { ipcMain } from 'electron'
 import path from 'node:path'
 import { getTodos, addTodo, deleteTodo, updateTodo } from './services/db.ts'
-import { getRoadmaps, addRoadmap, deleteRoadmap, getRoadmapNodes, addTaskNode, addResourceNode, addNoteNode, addMilestoneNode, deleteNode, updateNode, updateNodePosition, addEdge, deleteEdge, updateEdge, getEdges } from './services/roadmap.ts'
+import { getRoadmaps, addRoadmap, deleteRoadmap, getRoadmapNodes, addTaskNode, addResourceNode, addNoteNode, addMilestoneNode, deleteNode, updateNode, updateNodePosition, addEdge, deleteEdge, updateEdge, getEdges, exportRoadmap, importRoadmap } from './services/roadmap.ts'
 import { getFiles, getFileContent, createFile, deleteFile, updateFile, renameFile, createFolder, deleteFolder, renameFolder, copyFile, moveFile, moveFolder } from './services/explorer.ts'
 
 
@@ -123,6 +123,8 @@ app.whenReady().then(() => {
   ipcMain.handle('move-file', (_event, src, dest) => moveFile(src, dest));
   ipcMain.handle('move-folder', (_event, src, dest) => moveFolder(src, dest));
   ipcMain.handle('copy-file', (_event, src, dest) => copyFile(src, dest));
+  ipcMain.handle('export-roadmap', (_event, roadmapId) => exportRoadmap(roadmapId));
+  ipcMain.handle('import-roadmap', (_event, filePath) => importRoadmap(filePath));
 
   createWindow();
 });

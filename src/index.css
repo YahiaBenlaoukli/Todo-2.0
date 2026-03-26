@@ -1,34 +1,61 @@
 @import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&family=Lora:ital,wght@0,400..700;1,400..700&display=swap');
 
-:root, .crepe-root, .milkdown {
-  --color-primary: #028090;
-  --color-secondary: #114b5f;
-  --color-accent: #456990;
-  --color-text: #333333;
+:root,
+.crepe-root,
+.milkdown {
+  --color-primary: #0a8fa0;
+  /* teal — same family, slightly brighter */
+  --color-secondary: #0d5f72;
+  /* deep teal — replaces navy-blue drift */
+  --color-accent: #2eb8cc;
+  /* light cyan — punchy highlight, same hue */
+  --color-text: #1a2e35;
+  /* near-black with teal tint */
   --bg-color: #ffffff;
-  --bg-sidebar: #f5f5f5;
-  --border-color: #e5e5e5;
-  
-  /* Crepe overrides for light mode */
+  --bg-sidebar: #f2f8fa;
+  /* very subtle teal tint instead of grey */
+  --border-color: #d4eaee;
+  /* teal-tinted border */
+
   --crepe-color-background: transparent !important;
   --crepe-color-surface: transparent !important;
   --crepe-color-on-background: var(--color-text) !important;
 }
 
-.dark, .dark .crepe-root, .dark .milkdown {
-  --color-primary: #028090;
-  --color-secondary: #114b5f;
-  --color-accent: #456990;
-  --color-text: #dcddde;
-  --bg-color: #1e1e1e;
-  --bg-sidebar: #252525;
-  --border-color: #333333;
-  
-  /* Crepe overrides for dark mode */
+html.dark,
+html.dark .crepe-root,
+html.dark .milkdown {
+  --color-primary: #0a8fa0;
+  --color-secondary: #0d5f72;
+  --color-accent: #2eb8cc;
+  --color-text: #d4e4f0;
+  /* cool blue-white instead of neutral grey */
+  --bg-color: #0e1d27;
+  /* deep teal-black — replaces generic #1e1e1e */
+  --bg-sidebar: #132330;
+  --border-color: #1e3a4a;
+
   --crepe-color-background: transparent !important;
-  --crepe-color-surface: transparent !important;
+  --crepe-color-surface: #0e1d27 !important;
   --crepe-color-on-background: var(--color-text) !important;
+  --crepe-color-surface-low: #0b1820 !important;
+  --crepe-color-on-surface: #c8dce8 !important;
+  --crepe-color-on-surface-variant: #8ab0c0 !important;
+  --crepe-color-outline: #2e5a6e !important;
+  --crepe-color-primary: #2eb8cc !important;
+  --crepe-color-secondary: #0d5f72 !important;
+  --crepe-color-on-secondary: #d4e4f0 !important;
+  --crepe-color-inverse: #d4e4f0 !important;
+  --crepe-color-on-inverse: #0e1d27 !important;
+  --crepe-color-inline-code: #4dd9ec !important;
+  /* teal-cyan instead of red */
+  --crepe-color-error: #ff6b6b !important;
+  --crepe-color-hover: #142a38 !important;
+  --crepe-color-selected: #1e3a4a !important;
+  --crepe-color-inline-area: #132330 !important;
+  --crepe-shadow-1: 0px 1px 2px 0px rgba(0, 0, 0, .5), 0px 1px 3px 1px rgba(0, 0, 0, .3) !important;
+  --crepe-shadow-2: 0px 1px 2px 0px rgba(0, 0, 0, .5), 0px 2px 6px 2px rgba(0, 0, 0, .3) !important;
 }
 
 body {
@@ -44,6 +71,7 @@ body {
   --color-accent: var(--color-accent);
   --color-text: var(--color-text);
   --color-bg: var(--bg-color);
+  --color-sidebar: var(--bg-sidebar);
   --color-border: var(--border-color);
 }
 
